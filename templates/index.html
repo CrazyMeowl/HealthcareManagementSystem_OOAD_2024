@@ -1,5 +1,14 @@
 {% extends "layout.html" %}
 {% block title_block %}Index{% endblock %}
+
+{% block nav_right_block %}
+<span>
+	<a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
+	<a href="{{ url_for('register') }}" class="btn btn-dark">Register</a>
+</span>
+
+{% endblock %}
+
 {% block content_block %}
 <div class="container">
 	<div class="row">

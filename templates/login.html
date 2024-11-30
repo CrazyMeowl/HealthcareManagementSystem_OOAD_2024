@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title_block %}Login{% endblock %}
+
+{% block nav_right_block %}
+
+<h6>Don't have an account ? →  </h6>
+<a href="{{ url_for('register') }}" class="btn btn-dark">Register</a>
+
+{% endblock %}
+
+{% block content_block %}
+<div class="container">
+	<div class="row">
+		<h2>Login</h2>
+		<form method="post" action="{{ url_for('authenticate') }}">
+
+			<div class="form-group">
+				<label for="le_ssn">Social Security Number</label>
+				<input type="text" class="form-control" id="le_ssn" rows="2" name="ssn" placeholder="SSN: Social Security Number" required>
+			</div>
+			<div class="form-group">
+				<label for="le_password">Password</label>
+				<input type="password" class="form-control" id="le_password" rows="2" name="password" placeholder="Password" required>
+			</div>
+			<br>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+
+
+</div>
+{% endblock %}

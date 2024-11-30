@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+{% block title_block %}Register{% endblock %}
+
+{% block nav_right_block %}
+
+<h6>Already have an account ? → </h6>
+<a href="{{ url_for('login') }}" class="btn btn-dark">Login</a>
+
+
+{% endblock %}
+
+{% block content_block %}
+<div class="container">
+	<div class="row">
+		<!-- <h1>Register</h1> -->
+	</div>
+	<div class="row">
+		<h2>Register</h2>
+		<form method="get" action="">
+
+			<div class="form-group">
+				<label for="le_ssn">Social Security Number</label>
+				<input type="text" class="form-control" id="le_ssn" name="ssn" placeholder="SSN: Social Security Number"
+					required>
+			</div>
+
+			<div class="form-group">
+				<label for="le_password">Password</label>
+				<input type="password" class="form-control" id="le_password" name="password" placeholder="Password"
+					required>
+			</div>
+
+			<div class="form-group">
+				<label for="le_password">Repeat Password</label>
+				<input type="password" class="form-control" id="le_password_2" name="password_2" placeholder="Password"
+					required>
+			</div>
+			<br>
+			<p id="error_message" style="display: none;"></p>
+			<br>
+			<button id="submit_button" type="submit" class="btn btn-primary">Submit</button>
+			
+		</form>
+	</div>
+
+
+</div>
+{% endblock %}
+
+{% block script_block %}
+<script>
+	const passwordInput = document.getElementById('le_password');
+	const repeatPasswordInput = document.getElementById('le_password_2');
+	const errorMessage = document.getElementById('error_message');
+	const submitButton = document.getElementById('submit_button');
+
+	function validatePasswords() {
+
+		if (passwordInput.value !== repeatPasswordInput.value) {
+			
+			errorMessage.textContent = 'Passwords do not match.';
+			errorMessage.style.display = 'block';
+			submitButton.disabled  = true;
+		} else {
+			errorMessage.textContent = '';
+			errorMessage.style.display = 'none';
+			submitButton.disabled  = false;
+		}
+	}
+
+	// Add event listeners to trigger validation on input changes
+	passwordInput.addEventListener('input', validatePasswords);
+	repeatPasswordInput.addEventListener('input', validatePasswords);
+</script>
+{% endblock %}

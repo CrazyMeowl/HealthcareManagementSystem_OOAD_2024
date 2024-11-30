@@ -13,8 +13,24 @@ app_config = load_config()
 
 @app.route('/', methods=['GET'])
 def main():
-
 	return render_template('index.html',name = app_config['name'])
+
+@app.route('/login', methods=['GET'])
+def login():
+	return render_template('login.html',name = app_config['name'])
+
+
+
+@app.route('/authenticate', methods=['POST'])
+def authenticate():
+	ssn = request.form['ssn']
+	password = request.form['password']
+	return f"SSN: {ssn}, Password: {password}"
+
+@app.route('/register', methods=['GET'])
+def register():
+	return render_template('register.html',name = app_config['name'])
+
 
 
 if __name__ == '__main__':

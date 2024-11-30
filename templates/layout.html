@@ -21,9 +21,10 @@
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-					{% block nav_block %}{% endblock %}
+					{% block nav_left_block %}{% endblock %}
 					
 				</ul>
+				{% block nav_right_block %}{% endblock %}
 			</div>
 		</div>
 	</nav>
@@ -41,7 +42,7 @@
 			</div>
 		</div>
 	</div>
-	
+	{% block script_block %}{% endblock %}
 </body>
 
 </html>
