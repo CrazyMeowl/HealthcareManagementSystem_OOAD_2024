@@ -12,11 +12,11 @@
 <div class="container">
 	<div class="row">
 		<h2>Login</h2>
-		<form method="post" action="{{ url_for('authenticate') }}">
+		<form method="post" action="{{ url_for('login') }}">
 
 			<div class="form-group">
-				<label for="le_ssn">Social Security Number</label>
-				<input type="text" class="form-control" id="le_ssn" rows="2" name="ssn" placeholder="SSN: Social Security Number" required>
+				<label for="le_phone_number">Phone Number</label>
+				<input type="text" class="form-control" id="le_phone_number" rows="2" name="phone_number" placeholder="Phone Number" required>
 			</div>
 			<div class="form-group">
 				<label for="le_password">Password</label>
@@ -24,6 +24,8 @@
 			</div>
 			<br>
 			<button type="submit" class="btn btn-primary">Submit</button>
+			<br>
+			<p id="error_message" style="display: none;"></p>
 		</form>
 	</div>
 
