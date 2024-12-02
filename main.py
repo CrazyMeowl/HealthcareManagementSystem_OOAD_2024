@@ -26,9 +26,9 @@ app_config = load_config()
 
 @app.route('/', methods=['GET'])
 def main():
-	if session.get("name"):
+	if session.get('user_data'):
 		return redirect("/home")
-	return render_template('index.html',name = app_config['name'])
+	return render_template('index.html',app_name = app_config['app_name'])
 
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -47,17 +47,18 @@ def login():
 				return "Something ain't right"
 			else:
 				session['user_data']=le_data[phone_number]
-				return f"Logged In as {session["user_data"]}"
+				# return f"Logged In as {session['user_data']}"
+				return redirect('/home')
 				
 	# if session.get("user_data"):
 	# 	return redirect("/")
 	# GET
-	return render_template('login.html',name = app_config['name'])
+	return render_template('login.html',app_name = app_config['app_name'])
 
 @app.route('/logout', methods=['GET','POST'])
 def logout():
-	if session.pop("user_data",None):
-		return redirect("/")
+	session.pop("user_data",None)
+	return redirect("/")
 	
 @app.route('/register', methods=['GET','POST'])
 def register():
@@ -88,10 +89,13 @@ def register():
 
 			return "Nicely done"
 	# GET 
-	return render_template('register.html',name = app_config['name'])
+	return render_template('register.html',app_name = app_config['app_name'])
 
-#
-
+@app.route('/home', methods=['GET'])
+def home():
+	if not session.get('user_data'):
+		return redirect("/login")
+	return render_template('user_home.html',app_name = app_config['app_name'], user_data = session['user_data'])
 
 if __name__ == '__main__':
 	webbrowser.open('http://127.0.0.1:5000/', new=2)

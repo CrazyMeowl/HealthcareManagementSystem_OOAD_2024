@@ -2,24 +2,23 @@
 {% block title_block %}Home{% endblock %}
 
 {% block nav_left_block %}
-
-
+<a href="" class="btn">Book Appointment</a>
+<a href="" class="btn">Medical Records</a>
+<a href="" class="btn">Patient Journal</a>
 {% endblock %}
 
 {% block nav_right_block %}
-	<a href="{{ url_for('logout') }}" class="btn btn-dark">Logout</a>
+<a href="{{ url_for('logout') }}" class="btn btn-dark">Logout</a>
 {% endblock %}
 
 {% block content_block %}
 <div class="container">
 	<div class="row">
 		<h2>User's home</h2>
-		{{user_data["full_name"]}}
+		{{ user_data['full_name'] }}
 		<!-- THIS IS THE TEMPLATE -->
 		<!-- DO NOT EDIT ON THIS -->
 		<!-- COPY THIS OUT -->
 	</div>
-
-	
 </div>
 {% endblock %}
