@@ -1,11 +1,20 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session, redirect
+from flask_session import Session
 import json
 import webbrowser
 from utils.password_utils import *
 from utils.database_utils import *
-from models.user import *
+from models.user_model import *
+import os
 app = Flask(__name__)
 
+ 
+app = Flask(__name__)
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+app.config['SECRET_KEY'] = os.environ.get('SUPER_SECRET')
+Session(app)
+ 
 
 
 def load_config():
@@ -17,6 +26,8 @@ app_config = load_config()
 
 @app.route('/', methods=['GET'])
 def main():
+	if session.get("name"):
+		return redirect("/home")
 	return render_template('index.html',name = app_config['name'])
 
 @app.route('/login', methods=['GET','POST'])
@@ -27,18 +38,27 @@ def login():
 		password = request.form['password']
 		# Load database
 		le_data = load_data("users")
-		if item_existed(phone_number,le_data):
-			if verify_password(le_data[phone_number]["password"],password):
-				return "Logged In"
-			else:
-				return "Something ain't right"
+		if not item_existed(phone_number,le_data):
+			# Phone number not found
+			return "Cannot find User"
 		else:
-			return "The phone number is not registered"
-		
+			if not verify_password(le_data[phone_number]["password"],password):
+				# WRONG PASSWORD
+				return "Something ain't right"
+			else:
+				session['user_data']=le_data[phone_number]
+				return f"Logged In as {session["user_data"]}"
+				
+	# if session.get("user_data"):
+	# 	return redirect("/")
 	# GET
 	return render_template('login.html',name = app_config['name'])
 
-
+@app.route('/logout', methods=['GET','POST'])
+def logout():
+	if session.pop("user_data",None):
+		return redirect("/")
+	
 @app.route('/register', methods=['GET','POST'])
 def register():
 	# POST
@@ -51,7 +71,8 @@ def register():
 			gender = request.form['gender'],
 			date_of_birth = request.form['date_of_birth'],
 			ssn = request.form['ssn'],
-			password = str(hash_password(request.form['password']))
+			password = str(hash_password(request.form['password'])),
+			role = 'user'
 			)
 		# Load database
 		le_data = load_data("users")
@@ -59,7 +80,7 @@ def register():
 		
 		if item_existed(phone_number,le_data):
 			# phone number used
-			return "Not so fast"
+			return "This phone number is already in use. Please try another one."
 		else:
 			# add new user
 			le_data[phone_number] = new_user.__dict__
@@ -69,6 +90,7 @@ def register():
 	# GET 
 	return render_template('register.html',name = app_config['name'])
 
+#
 
 
 if __name__ == '__main__':

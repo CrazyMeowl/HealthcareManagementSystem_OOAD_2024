@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block title_block %}Template{% endblock %}
+{% block title_block %}Home{% endblock %}
 
 {% block nav_left_block %}
 
@@ -7,14 +7,14 @@
 {% endblock %}
 
 {% block nav_right_block %}
-
-
+	<a href="{{ url_for('logout') }}" class="btn btn-dark">Logout</a>
 {% endblock %}
 
 {% block content_block %}
 <div class="container">
 	<div class="row">
-		<h2>Template</h2>
+		<h2>User's home</h2>
+		{{user_data["full_name"]}}
 		<!-- THIS IS THE TEMPLATE -->
 		<!-- DO NOT EDIT ON THIS -->
 		<!-- COPY THIS OUT -->
