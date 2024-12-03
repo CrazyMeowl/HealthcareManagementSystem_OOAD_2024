@@ -4,12 +4,12 @@
         "phone_number": "0987654321",
         "email": "example@domain.com",
         "gender": "M",
-        "date_of_birth": "2024-12-01",
+        "date_of_birth": "2024-12-06",
         "ssn": "123456789012",
         "password": "JDJiJDEyJHZvY2c0cW0yd3lEYjllTW5Fbm8yaS5Jak9JWjhHQ3ZReGs2M1lQaTlvY21hNHNMMndqSDc2",
-        "height": null,
-        "weight": null,
-        "blood_type": null,
+        "height": "180",
+        "weight": "123asd",
+        "blood_type": "B",
         "role": "user"
     }
 }

@@ -83,7 +83,6 @@ def register():
 		return redirect("/home")
 	# POST
 	if request.method == 'POST':
-		phone_number=request.form['phone_number']
 		new_user = User(
 			full_name=request.form['full_name'],
 			phone_number=request.form['phone_number'],
@@ -98,12 +97,12 @@ def register():
 		le_data = load_data("users")
 
 		
-		if item_existed(phone_number,le_data):
+		if item_existed(new_user.phone_number,le_data):
 			# phone number used
 			return "This phone number is already in use. Please try another one."
 		else:
 			# add new user
-			le_data[phone_number] = new_user.__dict__
+			le_data[new_user.phone_number] = new_user.__dict__
 			save_data("users",le_data)
 			return redirect("/login")
 			# return "Nicely done"
@@ -116,7 +115,65 @@ def home():
 		return redirect("/login")
 	return render_template('user_home.html',app_name = app_config['app_name'], user_data = session['user_data'])
 
+@app.route('/profile', methods=['GET','POST'])
+def profile():
+	if not session.get('user_data'):
+		return redirect("/login")
+	
+	# POST
+	if request.method == 'POST':
+		user_data = session.get('user_data')
+		form_data = {
+			'full_name':request.form['full_name'],
+			'phone_number':request.form['phone_number'],
+			'email':request.form['email'],
+			'gender' : request.form['gender'],
+			'date_of_birth' : request.form['date_of_birth'],
+			'ssn' : request.form['ssn'],
+			'height':request.form['height'],
+			'weight':request.form['weight'],
+			'blood_type':request.form['blood_type'],
+			'role':'user'}
+			
+		# Load database
+		le_data = load_data("users")
+
+		# Not changing phone number
+		if item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] == user_data['phone_number']):
+			old_data = le_data[user_data['phone_number']]
+			for i in form_data:
+				old_data[i]=form_data[i]
+			le_data[user_data['phone_number']]=old_data
+			session['user_data']=old_data
+			save_data("users",le_data)
+			return  redirect('/profile')
+
+		# If the new phone number isnt in use
+		elif not item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] == user_data['phone_number']):
+			old_data = le_data[user_data['phone_number']]
+			for i in form_data:
+				old_data[i]=form_data[i]
+			le_data.pop(user_data['phone_number'])
+			le_data[form_data['phone_number']]=old_data
+			session['user_data']=old_data
+			save_data("users",le_data)
+			return  redirect('/profile')
+		# If the new phone number is in use
+		elif item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] != user_data['phone_number']):
+			return "The phone number is in use"
+		# if item_existed(form_data['phone_number'],le_data):
+		# 	# phone number used
+		# 	return "This phone number is already in use. Please try another one."
+		# else:
+		# 	# add new user
+		# 	le_data[new_user.phone_number] = new_user.__dict__
+		# 	save_data("users",le_data)
+		# 	return redirect("/login")
+			# return "Nicely done"
+	return render_template('user_profile.html',app_name = app_config['app_name'], user_data = session['user_data'])
+
+
 if __name__ == '__main__':
 	scheduler.start()
 	webbrowser.open('http://127.0.0.1:5000/', new=2)
-	app.run(debug=False)
+	app.run(debug=True)

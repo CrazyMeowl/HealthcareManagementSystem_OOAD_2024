@@ -1,0 +1,139 @@
+{% extends "layout.html" %}
+{% block title_block %}Home{% endblock %}
+
+{% block nav_left_block %}
+<a href="" class="btn">Book Appointment</a>
+<a href="" class="btn">Past Appointments</a>
+<a href="" class="btn">Medical Records</a>
+
+{% endblock %}
+
+{% block nav_right_block %}
+<!-- <a href="" class="btn">User's Profile</a> -->
+<a href="{{ url_for('logout') }}" class="btn btn-dark">Logout</a>
+{% endblock %}
+
+{% block content_block %}
+<div class="container">
+	<div class="row">
+		<h2>User's Profile</h2>
+		<br>
+		<form id="user_profile_form" method="post" action="{{ url_for('profile') }}">
+			
+			<div class="form-group">
+				<label for="le_full_name">Full Name</label>
+				<input type="text" class="form-control" id="le_full_name" name="full_name" placeholder="Trần Văn A" required disabled value="{{ user_data['full_name'] }}">
+			</div>
+
+			<div class="form-group">
+				<label for="le_phone_number">Phone Number</label>
+				<input type="text" class="form-control" id="le_phone_number" name="phone_number" placeholder="0987654321" required disabled value="{{ user_data['phone_number'] }}">
+			</div>
+
+			<div class="form-group">
+				<label for="le_email">Email (for reminding appointment)</label>
+				<input type="email" class="form-control" id="le_email" name="email" placeholder="example@domain.com" required disabled value="{{ user_data['email'] }}">
+			</div>
+
+
+			<div class="form-group">
+				<label for="gender">Gender</label>
+				<br>
+				<input type="radio" class="btn-check" name="gender" id="gender_m" value="M" disabled>
+				<label class="btn btn-outline-success" for="gender_m">Male</label>
+				<input type="radio" class="btn-check" name="gender" id="gender_f" value="F" disabled>
+				<label class="btn btn-outline-success" for="gender_f">Female</label>
+			</div>
+			
+			<div class="form-group">
+				<label for="le_date_of_birth">Date Of Birth</label>
+				<!-- DATE FORMAT YYYY-MM-DD -->
+				<input id="le_date_of_birth" name="date_of_birth" class="form-control" type="date" disabled value="{{ user_data['date_of_birth'] }}"/>
+			</div>
+
+
+			<div class="form-group">
+				<label for="le_ssn">Social Security Number</label>
+				<input type="text" class="form-control" id="le_ssn" name="ssn" placeholder="Số thẻ căn cước công dân" required disabled value="{{ user_data['ssn'] }}">
+			</div>
+
+			<div class="form-group">
+				<label for="le_ssn">Height</label>
+				<input type="text" class="form-control" id="le_height" name="height" placeholder="Chiều cao ( đơn vị cm )" required disabled value="{{ user_data['height'] }}">
+			</div>
+
+			<div class="form-group">
+				<label for="le_ssn">Weight</label>
+				<input type="text" class="form-control" id="le_weight" name="weight" placeholder="Cân nặng ( đơn vị kg )" required disabled value="{{ user_data['weight'] }}">
+			</div>
+
+			<div class="form-group">
+				<label for="blood_type">Blood Type</label>
+				<br>
+				<input type="radio" class="btn-check" name="blood_type" id="blood_type_a" value="A" disabled>
+				<label class="btn btn-outline-success" for="blood_type_a">A</label>
+				<input type="radio" class="btn-check" name="blood_type" id="blood_type_b" value="B" disabled>
+				<label class="btn btn-outline-success" for="blood_type_b">B</label>
+				<input type="radio" class="btn-check" name="blood_type" id="blood_type_ab" value="AB" disabled>
+				<label class="btn btn-outline-success" for="blood_type_ab">AB</label>
+				<input type="radio" class="btn-check" name="blood_type" id="blood_type_o" value="O" disabled>
+				<label class="btn btn-outline-success" for="blood_type_o">O</label>
+			</div>
+
+
+			<br>
+			<p id="error_message" style="display: none;"></p>
+			<br>
+			<button id="submit_button" style="display: none;" type="submit" class="btn btn-primary">Save Changes</button>
+			
+			
+		</form>
+		<button id="edit_button" onclick="enableEditing()" class="w-25 btn btn-primary">Edit Profile</button>
+	</div>
+</div>
+{% endblock %}
+
+{% block script_block %}
+<script>
+	function setBloodType(){
+		const user_blood_type = "{{ user_data['blood_type'] }}"
+		if (user_blood_type === "A"){
+			document.getElementById('blood_type_a').setAttribute('checked',"");
+		}
+		else if (user_blood_type === "B"){
+			document.getElementById('blood_type_b').setAttribute('checked',"");
+		}
+		else if (user_blood_type === "AB"){
+			document.getElementById('blood_type_ab').setAttribute('checked',"");
+		}
+		else if (user_blood_type === "O"){
+			document.getElementById('blood_type_o').setAttribute('checked',"");
+		}
+	}
+
+	function setGender(){
+		const user_gender = "{{ user_data['gender'] }}"
+		if (user_gender === "M"){
+			document.getElementById('gender_m').setAttribute('checked',"");
+		}
+		else{
+			document.getElementById('gender_f').setAttribute('checked',"");
+		}
+	}
+
+	function enableEditing() {
+		// Enable form fields by removing the 'disabled' attribute
+		const formElements = document.querySelectorAll('#user_profile_form input');
+		formElements.forEach(function(element) {
+			element.removeAttribute('disabled');
+		});
+
+		// Show the Save button and hide the Edit button
+		document.getElementById('submit_button').style.display = 'inline-block';
+		document.getElementById('edit_button').style.display = 'none';
+	}
+
+	setGender()
+	setBloodType()
+</script>
+{% endblock %}

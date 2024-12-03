@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block nav_right_block %}
-<a href="" class="btn">User's Profile</a>
+<a href="{{ url_for('profile') }}" class="btn">User's Profile</a>
 <a href="{{ url_for('logout') }}" class="btn btn-dark">Logout</a>
 {% endblock %}
 
