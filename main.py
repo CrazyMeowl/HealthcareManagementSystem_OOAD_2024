@@ -1,21 +1,33 @@
 from flask import Flask, request, jsonify, render_template, session, redirect
 from flask_session import Session
+from flask_apscheduler import APScheduler
+
 import json
 import webbrowser
+import time
+import os
+
 from utils.password_utils import *
 from utils.database_utils import *
 from models.user_model import *
-import os
 app = Flask(__name__)
 
  
 app = Flask(__name__)
+app.config["SCHEDULER_API_ENABLED"] = True
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['SECRET_KEY'] = os.environ.get('SUPER_SECRET')
+
+scheduler = APScheduler()
+scheduler.init_app(app)
 Session(app)
  
-
+# Define the routine function
+@scheduler.task('interval', id='send_remind_email', minutes=1)
+def send_remind_email():
+	# print(f'{time.time()}')
+	print("Sending Reminder Emails")
 
 def load_config():
 	with open("config.json",'r',encoding='utf-8') as f:
@@ -32,6 +44,10 @@ def main():
 
 @app.route('/login', methods=['GET','POST'])
 def login():
+	# if user logged in
+	if session.get('user_data'):
+		return redirect("/home")
+	
 	# POST
 	if request.method == 'POST':
 		phone_number = request.form['phone_number']
@@ -62,6 +78,9 @@ def logout():
 	
 @app.route('/register', methods=['GET','POST'])
 def register():
+	# if user logged in
+	if session.get('user_data'):
+		return redirect("/home")
 	# POST
 	if request.method == 'POST':
 		phone_number=request.form['phone_number']
@@ -86,8 +105,8 @@ def register():
 			# add new user
 			le_data[phone_number] = new_user.__dict__
 			save_data("users",le_data)
-
-			return "Nicely done"
+			return redirect("/login")
+			# return "Nicely done"
 	# GET 
 	return render_template('register.html',app_name = app_config['app_name'])
 
@@ -98,5 +117,6 @@ def home():
 	return render_template('user_home.html',app_name = app_config['app_name'], user_data = session['user_data'])
 
 if __name__ == '__main__':
+	scheduler.start()
 	webbrowser.open('http://127.0.0.1:5000/', new=2)
-	app.run(debug=True)
+	app.run(debug=False)
