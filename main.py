@@ -149,7 +149,7 @@ def profile():
 			return  redirect('/profile')
 
 		# If the new phone number isnt in use
-		elif not item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] == user_data['phone_number']):
+		elif not item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] != user_data['phone_number']):
 			old_data = le_data[user_data['phone_number']]
 			for i in form_data:
 				old_data[i]=form_data[i]
