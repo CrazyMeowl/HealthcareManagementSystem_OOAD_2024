@@ -27,7 +27,7 @@
 
 			<div class="form-group">
 				<label for="le_phone_number">Phone Number</label>
-				<input type="text" class="form-control" id="le_phone_number" name="phone_number" placeholder="0987654321" required disabled value="{{ user_data['phone_number'] }}">
+				<input type="tel" class="form-control" id="le_phone_number" name="phone_number" placeholder="0987654321" required disabled value="{{ user_data['phone_number'] }}">
 			</div>
 
 			<div class="form-group">
@@ -58,13 +58,13 @@
 			</div>
 
 			<div class="form-group">
-				<label for="le_ssn">Height</label>
-				<input type="text" class="form-control" id="le_height" name="height" placeholder="Chiều cao ( đơn vị cm )" required disabled value="{{ user_data['height'] }}">
+				<label for="le_height">Height</label>
+				<input type="number" class="form-control" id="le_height" name="height" placeholder="Chiều cao ( đơn vị cm )" required disabled value="{{ user_data['height'] }}">
 			</div>
 
 			<div class="form-group">
-				<label for="le_ssn">Weight</label>
-				<input type="text" class="form-control" id="le_weight" name="weight" placeholder="Cân nặng ( đơn vị kg )" required disabled value="{{ user_data['weight'] }}">
+				<label for="le_weight">Weight</label>
+				<input type="number" class="form-control" id="le_weight" name="weight" placeholder="Cân nặng ( đơn vị kg )" required disabled value="{{ user_data['weight'] }}">
 			</div>
 
 			<div class="form-group">
@@ -94,6 +94,53 @@
 {% endblock %}
 
 {% block script_block %}
+
+<script>
+	const phoneNumberInput = document.getElementById('le_phone_number');
+	const ssnInput = document.getElementById('le_ssn');
+
+	const errorMessage = document.getElementById('error_message');
+	const submitButton = document.getElementById('submit_button');
+
+	function validateDigitString(string, requiredDigits) {
+		const regex = new RegExp(`^[0-9]{${requiredDigits}}$`);
+		if (regex.test(string.toString())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	function validateInputs() {
+		invalidFlag = false
+		if (!validateDigitString(phoneNumberInput.value, 10)) {
+			errorMessage.textContent = 'Invalid Phone Number';
+			invalidFlag = true
+
+		}
+		else if (!validateDigitString(ssnInput.value,12)) {
+			errorMessage.textContent = 'Invalid Social Security Number';
+			invalidFlag = true
+
+		}
+		console.log(errorMessage.textContent)
+		if (!invalidFlag){
+			errorMessage.textContent = '';
+			errorMessage.style.display = 'None';
+			submitButton.disabled = false;
+		} else {
+			errorMessage.style.display = 'block';
+			submitButton.disabled = true;
+		}
+	}
+
+	// Add event listeners to trigger validation on input changes
+	phoneNumberInput.addEventListener('input', validateInputs);
+	ssnInput.addEventListener('input', validateInputs);
+
+
+</script>
+
 <script>
 	function setBloodType(){
 		const user_blood_type = "{{ user_data['blood_type'] }}"

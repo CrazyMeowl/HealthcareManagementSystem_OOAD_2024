@@ -1,5 +1,16 @@
 {% extends "layout.html" %}
+
 {% block title_block %}Register{% endblock %}
+
+{% block style_block %}
+.valid {
+border-color: green;
+}
+
+.invalid {
+border-color: red;
+}
+{% endblock %}
 
 {% block nav_right_block %}
 
@@ -18,21 +29,23 @@
 		<h2>Register</h2>
 		<br>
 		<form method="post" action="{{ url_for('register') }}">
-			
+
 			<div class="form-group">
 				<label for="le_full_name">Full Name</label>
-				<input type="text" class="form-control" id="le_full_name" name="full_name" placeholder="Trần Văn A" required value="">
+				<input type="text" class="form-control" id="le_full_name" name="full_name" placeholder="Trần Văn A"
+					required value="">
 			</div>
 
 			<div class="form-group">
 				<label for="le_phone_number">Phone Number</label>
-				<input type="text" class="form-control" id="le_phone_number" name="phone_number" placeholder="0987654321"
+				<input type="tel" class="form-control" id="le_phone_number" name="phone_number" placeholder="0987654321"
 					required value="">
 			</div>
 
 			<div class="form-group">
 				<label for="le_email">Email (for reminding appointment)</label>
-				<input type="email" class="form-control" id="le_email" name="email" placeholder="example@domain.com" required value="">
+				<input type="email" class="form-control" id="le_email" name="email" placeholder="example@domain.com"
+					required value="">
 			</div>
 
 
@@ -44,10 +57,10 @@
 				<input type="radio" class="btn-check" name="gender" id="female" value="F">
 				<label class="btn btn-outline-success" for="female">Female</label>
 			</div>
-			
+
 			<div class="form-group">
 				<label for="le_date_of_birth">Date Of Birth</label>
-				<input id="le_date_of_birth" name="date_of_birth" class="form-control" type="date"/>
+				<input id="le_date_of_birth" name="date_of_birth" class="form-control" type="date" />
 			</div>
 
 
@@ -59,18 +72,22 @@
 
 			<div class="form-group">
 				<label for="le_password">Password</label>
-				<input type="password" class="form-control" id="le_password" name="password" placeholder="Mật Khẩu" required value="">
+				<input type="password" class="form-control" id="le_password" name="password" placeholder="Mật Khẩu"
+					required value="">
 			</div>
 
 			<div class="form-group">
 				<label for="le_password">Repeat Password</label>
-				<input type="password" class="form-control" id="le_password_2" name="password_2" placeholder="Mật Khẩu" required >
+				<input type="password" class="form-control" id="le_password_2" name="password_2" placeholder="Mật Khẩu"
+					required>
 			</div>
 			<br>
 			<p id="error_message" style="display: none;"></p>
+			<p id="error_message" style="display: none;"></p>
+			<p id="error_message" style="display: none;"></p>
 			<br>
 			<button id="submit_button" type="submit" class="btn btn-primary">Submit</button>
-			
+
 		</form>
 	</div>
 
@@ -82,25 +99,54 @@
 <script>
 	const passwordInput = document.getElementById('le_password');
 	const repeatPasswordInput = document.getElementById('le_password_2');
+	const phoneNumberInput = document.getElementById('le_phone_number');
+	const ssnInput = document.getElementById('le_ssn');
+
 	const errorMessage = document.getElementById('error_message');
 	const submitButton = document.getElementById('submit_button');
 
-	function validatePasswords() {
-
-		if (passwordInput.value !== repeatPasswordInput.value) {
-			
-			errorMessage.textContent = 'Passwords do not match.';
-			errorMessage.style.display = 'block';
-			submitButton.disabled  = true;
+	function validateDigitString(string, requiredDigits) {
+		const regex = new RegExp(`^[0-9]{${requiredDigits}}$`);
+		if (regex.test(string.toString())) {
+			return true;
 		} else {
+			return false;
+		}
+	}
+
+	function validateInputs() {
+		invalidFlag = false
+		if (!validateDigitString(phoneNumberInput.value, 10)) {
+			errorMessage.textContent = 'Invalid Phone Number';
+			invalidFlag = true
+
+		}
+		else if (!validateDigitString(ssnInput.value,12)) {
+			errorMessage.textContent = 'Invalid Social Security Number';
+			invalidFlag = true
+
+		}
+		else if (passwordInput.value !== repeatPasswordInput.value) {
+			errorMessage.textContent = 'Passwords do not match.';
+			invalidFlag = true
+		} 
+		console.log(errorMessage.textContent)
+		if (!invalidFlag){
 			errorMessage.textContent = '';
-			errorMessage.style.display = 'none';
-			submitButton.disabled  = false;
+			errorMessage.style.display = 'None';
+			submitButton.disabled = false;
+		} else {
+			errorMessage.style.display = 'block';
+			submitButton.disabled = true;
 		}
 	}
 
 	// Add event listeners to trigger validation on input changes
-	passwordInput.addEventListener('input', validatePasswords);
-	repeatPasswordInput.addEventListener('input', validatePasswords);
+	passwordInput.addEventListener('input', validateInputs);
+	repeatPasswordInput.addEventListener('input', validateInputs);
+	phoneNumberInput.addEventListener('input', validateInputs);
+	ssnInput.addEventListener('input', validateInputs);
+
+
 </script>
 {% endblock %}

@@ -56,11 +56,11 @@ def login():
 		le_data = load_data("users")
 		if not item_existed(phone_number,le_data):
 			# Phone number not found
-			return "Cannot find User"
+			return render_template('login.html',app_name = app_config['app_name'],phone_number=phone_number,message="Wrong Phone Number",message_type="danger")
 		else:
 			if not verify_password(le_data[phone_number]["password"],password):
 				# WRONG PASSWORD
-				return "Something ain't right"
+				return render_template('login.html',app_name = app_config['app_name'],phone_number=phone_number,message="Wrong Password",message_type="danger")
 			else:
 				session['user_data']=le_data[phone_number]
 				# return f"Logged In as {session['user_data']}"
@@ -99,8 +99,13 @@ def register():
 		
 		if item_existed(new_user.phone_number,le_data):
 			# phone number used
-			return "This phone number is already in use. Please try another one."
+			return render_template('register.html',app_name = app_config['app_name'],message="Phone number is registered to another account",message_type="warning")
+		elif query_existed('email',new_user.email,le_data):
+			return render_template('register.html',app_name = app_config['app_name'],message="Email is registered to another account",message_type="warning")
+		elif query_existed('ssn',new_user.ssn,le_data):
+			return render_template('register.html',app_name = app_config['app_name'],message="SSN is registered to another account",message_type="warning")
 		else:
+			# SUCCESS
 			# add new user
 			le_data[new_user.phone_number] = new_user.__dict__
 			save_data("users",le_data)

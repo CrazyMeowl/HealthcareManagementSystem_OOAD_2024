@@ -22,3 +22,12 @@ def item_existed(item,data):
         return True
     else:
         return False
+
+# Function to check if the value of that key existed in the database
+# for example to check if email : example@domain.com existed use
+# query_existed('email','example@domain.com',data)
+def query_existed(key,value,data):
+    for item in data:
+        if data[item][key] == value:
+            return True
+    return False
