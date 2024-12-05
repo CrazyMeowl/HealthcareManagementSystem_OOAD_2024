@@ -160,16 +160,8 @@ def profile():
 			return  redirect('/profile')
 		# If the new phone number is in use
 		elif item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] != user_data['phone_number']):
-			return "The phone number is in use"
-		# if item_existed(form_data['phone_number'],le_data):
-		# 	# phone number used
-		# 	return "This phone number is already in use. Please try another one."
-		# else:
-		# 	# add new user
-		# 	le_data[new_user.phone_number] = new_user.__dict__
-		# 	save_data("users",le_data)
-		# 	return redirect("/login")
-			# return "Nicely done"
+			return render_template('user_profile.html',app_name = app_config['app_name'], user_data = session['user_data'],message="The Phone Number is currently in use",message_type="danger")
+
 	return render_template('user_profile.html',app_name = app_config['app_name'], user_data = session['user_data'])
 
 

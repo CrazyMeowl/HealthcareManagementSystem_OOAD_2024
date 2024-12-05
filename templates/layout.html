@@ -36,6 +36,13 @@
 			</div>
 			<div class="col-6">
 				{% block content_block %}{% endblock %}
+				<br>
+				{% if message %}
+					<div class="alert alert-{{ message_type }} alert-dismissible fade show" role="alert">
+						<strong>{{ message }}</strong>
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				{% endif %}
 			</div>
 			<div class="col">
 				<!-- One of three columns -->
@@ -43,6 +50,10 @@
 		</div>
 	</div>
 	{% block script_block %}{% endblock %}
+
+	
+	
+	  
 </body>
 
 </html>

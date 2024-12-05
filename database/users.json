@@ -9,6 +9,19 @@
         "password": "JDJiJDEyJHZvY2c0cW0yd3lEYjllTW5Fbm8yaS5Jak9JWjhHQ3ZReGs2M1lQaTlvY21hNHNMMndqSDc2",
         "height": "180",
         "weight": "123asd",
+        "blood_type": "A",
+        "role": "user"
+    },
+    "0987654321": {
+        "full_name": "Trần Văn A",
+        "phone_number": "0987654321",
+        "email": "example@domain.com",
+        "gender": "M",
+        "date_of_birth": "2024-12-05",
+        "ssn": "099999999999",
+        "password": "JDJiJDEyJHFQalN5VmdNcDVzZVdnMlVZdEozYWVwelN5UkZhRmE2akd1R2h5LzhnWTBVUHRKZWZNZ2V1",
+        "height": "None",
+        "weight": "None",
         "blood_type": "B",
         "role": "user"
     }
