@@ -1,0 +1,14 @@
+{
+    "apt_id":{
+        "apt_type":"",
+        "category":"",
+        "date":"YYYY-MM-DD",
+        "session":"morning/afternoon",
+        "number":"1-20",
+        "customer_phone":"phone_number",
+        "status":"pending/accepted/processed",
+        "rating":"1-5",
+        "description":""
+    }
+
+}

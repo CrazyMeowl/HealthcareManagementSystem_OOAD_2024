@@ -6,6 +6,8 @@ import json
 import webbrowser
 import time
 import os
+from datetime import datetime, timedelta
+from random import choice
 
 from utils.password_utils import *
 from utils.database_utils import *
@@ -176,9 +178,32 @@ def book_appointment():
 	
 	# POST
 	if request.method == 'POST':
-		pass
-	return render_template('book_appointment.html',app_name = app_config['app_name'], user_data = session['user_data'])
+		request.form
+		return request.form
+	
+	min_date = datetime.today().strftime('%Y-%m-%d')
+	max_date = (datetime.today() + timedelta(weeks=2)).strftime('%Y-%m-%d')
+	return render_template('book_appointment.html', app_name = app_config['app_name'], user_data = session['user_data'], min_date = min_date, max_date = max_date)
 
+
+@app.route('/api/get_availability/', methods=['GET'])
+def get_availability():
+	apt_type = request.args.get('apt_type')
+	apt_date = request.args.get('apt_date')
+	category = request.args.get('category')
+	print(apt_type,category,apt_date)
+	print(f'Type:"{apt_type}"')
+	print(f'Date:"{apt_date}"')
+
+	print(f'Category:"{category}"')
+
+	availability = {
+        'morning': choice([True,False]),
+        'afternoon': choice([True,False])
+    }
+	print(availability)
+	return jsonify(availability)
+	
 if __name__ == '__main__':
 	scheduler.start()
 	webbrowser.open('http://127.0.0.1:5000/', new=2)

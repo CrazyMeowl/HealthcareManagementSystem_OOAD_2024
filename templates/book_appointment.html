@@ -18,38 +18,128 @@
 <div class="container">
 	<div class="row">
 		<br>
-		
-		<form id="select_date_from" method="post" action="{{ url_for('profile') }}">
+
+		<form id="select_date_from" method="post" action="{{ url_for('book_appointment') }}">
 
 			<div class="form-group">
-				<label for="apt_type">Type</label>
-				<br>
-				<input type="radio" class="btn-check" name="apt_type" id="apt_type_general" value="general" >
-				<label class="btn btn-outline-success" for="apt_type_general">General health examination</label>
-				<input type="radio" class="btn-check" name="apt_type" id="apt_type_driver" value="driver" >
-				<label class="btn btn-outline-success" for="apt_type_driver">Driver medical examination</label>
-				<input type="radio" class="btn-check" name="apt_type" id="apt_type_employment" value="employment" >
-				<label class="btn btn-outline-success" for="apt_type_employment">Employment medical examination</label>
-				<input type="radio" class="btn-check" name="apt_type" id="apt_type_on_demand" value="demand" >
-				<label class="btn btn-outline-success" for="apt_type_on_demand">On-demand medical service</label>
-
-				<select class="form-select" aria-label="Default select example">
-					<option selected>Open this select menu</option>
-					<option value="1">One</option>
-					<option value="2">Two</option>
-					<option value="3">Three</option>
-				  </select>
+				<label for="le_apt_type">
+					<h3><strong>STEP 1. Select Appointment Type</strong></h3>
+				</label>
+				<select id="le_apt_type" class="form-select" name="apt_type" required onchange="toggleSubSelect()">
+					<option value="" disabled selected>Select appointment type here !!!</option>
+					<option value="general">General health examination</option>
+					<option value="driver">Driver medical examination</option>
+					<option value="employment">Employment medical examination</option>
+					<option value="demand">On-demand medical service</option>
+				</select>
 			</div>
 
+			<div id="category_select_group" class="form-group" style="display:none;">
+				<label for="le_category">
+					<h3><strong>Step 1.1 Select Wanted Category</strong></h3>
+				</label>
+				<select id="le_category" class="form-select" name="category" required disabled
+					onchange="checkAvailability()">
+					<option value="" disabled selected>Select category here !!!</option>
+					<option value="ent">Ear, Nose and Throat (ENT)</option>
+					<option value="eyes">Ophthalmology (Eyes)</option>
+					<option value="neurology">Neurology</option>
+				</select>
+			</div>
+
+			<!-- DATE FORMAT YYYY-MM-DD -->
 			<div class="form-group">
-				<label for="le_appointment_date">Select Date</label>
-				<!-- DATE FORMAT YYYY-MM-DD -->
-				<input id="le_appointment_date" name="apt_date" class="form-control" type="date"   min="{{ min_date }}" max="{{ max_date }}"/>
+				<label for="le_apt_date">
+					<h3><strong>STEP 2. Select Date</strong></h3>
+				</label>
+				<input id="le_apt_date" name="apt_date" class="form-control" type="date" min="{{ min_date }}"
+					max="{{ max_date }}" required onchange="checkAvailability()" />
 			</div>
+
+			<div id="" class="form-group">
+				<label for="le_sesion">
+					<h3><strong>STEP 3. Select Session</strong></h3>
+				</label>
+				<select id="le_sesion" class="form-select" name="session" required>
+					<option id="le_session_default" value="" disabled selected>Select session here !!!</option>
+					<option id="le_morning" value="morning">Morning (7 AM - 11 AM)</option>
+					<option id="le_afternoon" value="afternoon">Afternoon (1PM - 6PM)</option>
+				</select>
+			</div>
+			<button id="submit_button" type="submit" class="btn btn-primary">Submit</button>
+
 	</div>
 </div>
 {% endblock %}
 
 {% block script_block %}
+<script>
+	// Function to show/hide the second select list based on the main select option
+	function toggleSubSelect() {
+		var apt_type_select = document.getElementById("le_apt_type");
+		var category_select = document.getElementById("le_category");
+		var category_select_group = document.getElementById("category_select_group");
 
+		// Show the sub-select only when option 4 is selected
+		if (apt_type_select.value == "demand") {
+			category_select_group.style.display = "block";
+			category_select.removeAttribute('disabled');
+		} else {
+			category_select_group.style.display = "none";
+			category_select.setAttribute('disabled', "");
+		}
+		checkAvailability();
+	}
+	function checkAvailability() {
+		console.log("changed")
+		const apt_type = document.getElementById("le_apt_type").value;
+		const category = document.getElementById("le_category").value;
+		const apt_date = document.getElementById("le_apt_date").value;
+
+		const le_sesion = document.getElementById("le_sesion");
+		// reset session selection
+		le_sesion.selectedIndex = 0
+
+		const le_morning = document.getElementById("le_morning");
+		const le_afternoon = document.getElementById("le_afternoon");
+
+		console.log(`?apt_type=${apt_type}&category=${category}&apt_date=${apt_date}`)
+
+
+
+		const baseUrl = window.location.origin;
+		const endpoint = '/api/get_availability'
+		const apiUrl = baseUrl + endpoint + `?apt_type=${apt_type}&category=${category}&apt_date=${apt_date}`;
+		// const apiUrl = `https://yourapi.com/api/check-availability?itemId=${selectedValue}`;
+
+		// Call the API to check availability
+		fetch(apiUrl)
+			.then(response => response.json())  // Assuming the API returns JSON
+			.then(data => {
+				const isMorningAvailable = data.morning;
+				const isAfternoonAvailable = data.afternoon;
+
+
+				if (isMorningAvailable) {
+					le_morning.innerHTML = "Morning (7 AM - 11 AM)";
+					le_morning.removeAttribute('disabled');
+				} else {
+					le_morning.innerHTML = "Morning (7 AM - 11 AM) FULL";
+					le_morning.setAttribute('disabled', "");
+				}
+
+				if (isAfternoonAvailable) {
+					le_afternoon.innerHTML = "Afternoon (1PM - 6PM)";
+					le_afternoon.removeAttribute('disabled');
+				} else {
+					le_afternoon.innerHTML = "Afternoon (1PM - 6PM) FULL";
+					le_afternoon.setAttribute('disabled', "");
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+	}
+
+</script>
 {% endblock %}
