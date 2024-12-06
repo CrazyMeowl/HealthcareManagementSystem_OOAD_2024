@@ -169,6 +169,15 @@ def profile():
 
 	return render_template('user_profile.html',app_name = app_config['app_name'], user_data = session['user_data'])
 
+@app.route('/book_appointment', methods=['GET','POST'])
+def book_appointment():
+	if not session.get('user_data'):
+		return redirect("/login")
+	
+	# POST
+	if request.method == 'POST':
+		pass
+	return render_template('book_appointment.html',app_name = app_config['app_name'], user_data = session['user_data'])
 
 if __name__ == '__main__':
 	scheduler.start()

@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block title_block %}Home{% endblock %}
+
+{% block nav_left_block %}
+<a href="" class="btn">Book Appointment</a>
+<a href="" class="btn">Past Appointments</a>
+<a href="" class="btn">Medical Records</a>
+
+{% endblock %}
+
+{% block nav_right_block %}
+<!-- <a href="" class="btn">User's Profile</a> -->
+<a href="{{ url_for('logout') }}" class="btn btn-dark">Logout</a>
+{% endblock %}
+
+{% block content_block %}
+
+<div class="container">
+	<div class="row">
+		<br>
+		
+		<form id="select_date_from" method="post" action="{{ url_for('profile') }}">
+
+			<div class="form-group">
+				<label for="apt_type">Type</label>
+				<br>
+				<input type="radio" class="btn-check" name="apt_type" id="apt_type_general" value="general" >
+				<label class="btn btn-outline-success" for="apt_type_general">General health examination</label>
+				<input type="radio" class="btn-check" name="apt_type" id="apt_type_driver" value="driver" >
+				<label class="btn btn-outline-success" for="apt_type_driver">Driver medical examination</label>
+				<input type="radio" class="btn-check" name="apt_type" id="apt_type_employment" value="employment" >
+				<label class="btn btn-outline-success" for="apt_type_employment">Employment medical examination</label>
+				<input type="radio" class="btn-check" name="apt_type" id="apt_type_on_demand" value="demand" >
+				<label class="btn btn-outline-success" for="apt_type_on_demand">On-demand medical service</label>
+
+				<select class="form-select" aria-label="Default select example">
+					<option selected>Open this select menu</option>
+					<option value="1">One</option>
+					<option value="2">Two</option>
+					<option value="3">Three</option>
+				  </select>
+			</div>
+
+			<div class="form-group">
+				<label for="le_appointment_date">Select Date</label>
+				<!-- DATE FORMAT YYYY-MM-DD -->
+				<input id="le_appointment_date" name="apt_date" class="form-control" type="date"   min="{{ min_date }}" max="{{ max_date }}"/>
+			</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block script_block %}
+
+{% endblock %}
