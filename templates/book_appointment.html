@@ -2,9 +2,7 @@
 {% block title_block %}Home{% endblock %}
 
 {% block nav_left_block %}
-<a href="" class="btn">Book Appointment</a>
-<a href="" class="btn">Past Appointments</a>
-<a href="" class="btn">Medical Records</a>
+
 
 {% endblock %}
 
@@ -38,7 +36,7 @@
 				<label for="le_category">
 					<h3><strong>Step 1.1 Select Wanted Category</strong></h3>
 				</label>
-				<select id="le_category" class="form-select" name="category" required disabled
+				<select id="le_category" class="form-select" name="apt_category" required disabled
 					onchange="checkAvailability()">
 					<option value="" disabled selected>Select category here !!!</option>
 					<option value="ent">Ear, Nose and Throat (ENT)</option>
@@ -60,7 +58,7 @@
 				<label for="le_sesion">
 					<h3><strong>STEP 3. Select Session</strong></h3>
 				</label>
-				<select id="le_sesion" class="form-select" name="session" required>
+				<select id="le_sesion" class="form-select" name="apt_session" required>
 					<option id="le_session_default" value="" disabled selected>Select session here !!!</option>
 					<option id="le_morning" value="morning">Morning (7 AM - 11 AM)</option>
 					<option id="le_afternoon" value="afternoon">Afternoon (1PM - 6PM)</option>
@@ -118,19 +116,33 @@
 			.then(data => {
 				const isMorningAvailable = data.morning;
 				const isAfternoonAvailable = data.afternoon;
-
+				const today = new Date();
+				const currentHour = today.getHours();
 
 				if (isMorningAvailable) {
-					le_morning.innerHTML = "Morning (7 AM - 11 AM)";
-					le_morning.removeAttribute('disabled');
+					if ("{{ min_date }}" == apt_date && currentHour >= 10){
+						// Check if the time has passed 10AM
+						le_morning.innerHTML = "Morning (7 AM - 11 AM) Time Passed";
+						le_morning.setAttribute('disabled', "");
+					} else {
+						le_morning.innerHTML = "Morning (7 AM - 11 AM)";
+						le_morning.removeAttribute('disabled');
+					}
 				} else {
 					le_morning.innerHTML = "Morning (7 AM - 11 AM) FULL";
 					le_morning.setAttribute('disabled', "");
 				}
 
 				if (isAfternoonAvailable) {
-					le_afternoon.innerHTML = "Afternoon (1PM - 6PM)";
-					le_afternoon.removeAttribute('disabled');
+					// Check if the time has passed 5PM 
+					if ("{{ min_date }}" == apt_date && currentHour >= 17){
+						le_afternoon.innerHTML = "Afternoon (1PM - 6PM) Time Passed";
+						le_afternoon.setAttribute('disabled', "");
+					} else {
+						le_afternoon.innerHTML = "Afternoon (1PM - 6PM)";
+						le_afternoon.removeAttribute('disabled');
+					}
+					
 				} else {
 					le_afternoon.innerHTML = "Afternoon (1PM - 6PM) FULL";
 					le_afternoon.setAttribute('disabled', "");

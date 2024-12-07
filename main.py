@@ -12,6 +12,7 @@ from random import choice
 from utils.password_utils import *
 from utils.database_utils import *
 from models.user_model import *
+from models.apppointment_model import *
 app = Flask(__name__)
 
  
@@ -178,8 +179,37 @@ def book_appointment():
 	
 	# POST
 	if request.method == 'POST':
-		request.form
-		return request.form
+		# Load database
+		le_data = load_data("appointments")
+  
+		if request.form['apt_type'] != "demand":
+			apt_category = ""
+		else:
+			apt_category = request.form['apt_category']
+   
+   
+		apt_number = 1
+		for item_id in le_data:
+			item  = le_data[item_id]
+			if ( item['apt_type'] == request.form['apt_type'] ) and (item['apt_category'] == apt_category) and (item['apt_date'] == request.form['apt_date']) and (item['apt_session'] == request.form['apt_session']):
+				apt_number +=1
+  
+		
+		le_apt = Appointment(apt_type = request.form['apt_type'],
+						apt_category = apt_category,
+						apt_date = request.form['apt_date'],
+						apt_session = request.form['apt_session'],
+						apt_number = apt_number,
+						customer_phone= session['user_data']['phone_number'],
+						status="pending",
+						description="",
+						rating=None,			
+		)
+	
+		le_data[f"{len(le_data)+1}"]=le_apt.__dict__
+		save_data("appointments",le_data)
+
+		return redirect('/home')
 	
 	min_date = datetime.today().strftime('%Y-%m-%d')
 	max_date = (datetime.today() + timedelta(weeks=2)).strftime('%Y-%m-%d')
@@ -190,18 +220,27 @@ def book_appointment():
 def get_availability():
 	apt_type = request.args.get('apt_type')
 	apt_date = request.args.get('apt_date')
-	category = request.args.get('category')
-	print(apt_type,category,apt_date)
-	print(f'Type:"{apt_type}"')
-	print(f'Date:"{apt_date}"')
+	apt_category = request.args.get('apt_category')
 
-	print(f'Category:"{category}"')
+	if apt_type != 'demand':
+		apt_category = ""
+
+	le_data = load_data("appointments")
+
+	morning_count = 0
+	afternoon_count = 0
+	for i in le_data:
+		if (le_data[i]['apt_date'] == apt_date) and (le_data[i]['apt_type'] == apt_type) and (le_data[i]['apt_category'] == apt_category):
+			if le_data[i]['apt_session'] == 'morning':
+				morning_count+=1
+			else: 
+				afternoon_count+=1
 
 	availability = {
-        'morning': choice([True,False]),
-        'afternoon': choice([True,False])
+        'morning': morning_count < 10,
+        'afternoon': afternoon_count < 10,
     }
-	print(availability)
+
 	return jsonify(availability)
 	
 if __name__ == '__main__':

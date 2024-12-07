@@ -37,5 +37,18 @@
         "weight": null,
         "blood_type": null,
         "role": "user"
+    },
+    "9999999999": {
+        "full_name": "Test User",
+        "phone_number": "9999999999",
+        "email": "test.user@domain.com",
+        "gender": "M",
+        "date_of_birth": "0001-01-01",
+        "ssn": "000000000001",
+        "password": "JDJiJDEyJHdKVDlhYXIyYjVtTnQ2Vy90R1JsR3VLMWI0V25nNVNUdGI0RWhyTEtGcmhoS2J3MThGUWcy",
+        "height": "180",
+        "weight": "70",
+        "blood_type": "A",
+        "role": "user"
     }
 }
