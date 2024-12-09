@@ -31,3 +31,20 @@ def query_existed(key,value,data):
         if data[item][key] == value:
             return True
     return False
+
+
+def replace_data(database_name, old_phrase, new_phrase):
+    try:
+        file_name = f'./database/{database_name}.json'
+        # Open the file in read mode
+        with open(file_name, 'r', encoding='utf-8') as file:
+            content = file.read()
+        
+        # Replace the old phrase with the new one
+        updated_content = content.replace(old_phrase, new_phrase)
+        
+        # Open the file in write mode to save the updated content
+        with open(file_name, 'w', encoding='utf-8') as file:
+            file.write(updated_content)
+    except Exception as bug:
+        print(bug)

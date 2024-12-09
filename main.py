@@ -11,8 +11,11 @@ from random import choice
 
 from utils.password_utils import *
 from utils.database_utils import *
+from utils.qr_code_utils import * 
+from utils.email_utils import *
 from models.user_model import *
 from models.apppointment_model import *
+
 app = Flask(__name__)
 
  
@@ -22,15 +25,26 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['SECRET_KEY'] = os.environ.get('SUPER_SECRET')
 
+Session(app)
 scheduler = APScheduler()
 scheduler.init_app(app)
-Session(app)
+
+
  
 # Define the routine function
 @scheduler.task('interval', id='send_remind_email', minutes=1)
 def send_remind_email():
-	# print(f'{time.time()}')
-	print("Sending Reminder Emails")
+	# email_username = os.environ.get('SENDER_EMAIL_USERNAME')
+	# email_password = os.environ.get('SENDER_EMAIL_PASSWORD')
+	# html_content = "<h1>Your appointment is near<h1>"
+	# qr_data = f"""/
+
+	# """
+	# send_email(email_username,email_password, "email", "Appointment Reminder", html_content, generate_qr_code_base64(qr_data))
+	print('sending email')
+	# print()
+
+	
 
 def load_config():
 	with open("config.json",'r',encoding='utf-8') as f:
@@ -148,6 +162,11 @@ def profile():
 
 		# Not changing phone number
 		if item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] == user_data['phone_number']):
+
+			# Change email 
+			if (user_data['email'] != form_data['email']):
+				replace_data('appointments.json',user_data['email'],form_data['email'])
+
 			old_data = le_data[user_data['phone_number']]
 			for i in form_data:
 				old_data[i]=form_data[i]
@@ -159,6 +178,13 @@ def profile():
 		# If the new phone number isnt in use
 		elif not item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] != user_data['phone_number']):
 			old_data = le_data[user_data['phone_number']]
+
+			# Change phone number in appointments database
+			replace_data('appointments',user_data['phone_number'],form_data['phone_number'])
+			# Change email in appointments database
+			if (user_data['email'] != form_data['email']):
+				replace_data('appointments',user_data['email'],form_data['email'])
+
 			for i in form_data:
 				old_data[i]=form_data[i]
 			le_data.pop(user_data['phone_number'])
@@ -200,15 +226,26 @@ def book_appointment():
 						apt_date = request.form['apt_date'],
 						apt_session = request.form['apt_session'],
 						apt_number = apt_number,
-						customer_phone= session['user_data']['phone_number'],
+						customer_phone = session['user_data']['phone_number'],
+						customer_email = session['user_data']['email'],
 						status="pending",
 						description="",
 						rating=None,			
 		)
-	
-		le_data[f"{len(le_data)+1}"]=le_apt.__dict__
+		apt_id = len(le_data)+1
+		le_data[f"{apt_id}"]=le_apt.__dict__
 		save_data("appointments",le_data)
 
+		html_content = "<h1>This email is to inform you that you booked an appointment throught our system <h1>"
+		qr_data = f"""
+Appointment Id : {apt_id}
+{le_apt.to_qr_data()}
+		"""
+		send_email(le_apt.customer_email, "Appointment Accepted", html_content, generate_qr_code_base64(qr_data))
+		print('sending email')
+
+
+	
 		return redirect('/home')
 	
 	min_date = datetime.today().strftime('%Y-%m-%d')
@@ -237,13 +274,13 @@ def get_availability():
 				afternoon_count+=1
 
 	availability = {
-        'morning': morning_count < 10,
-        'afternoon': afternoon_count < 10,
-    }
+		'morning': morning_count < 10,
+		'afternoon': afternoon_count < 10,
+	}
 
 	return jsonify(availability)
 	
 if __name__ == '__main__':
 	scheduler.start()
 	webbrowser.open('http://127.0.0.1:5000/', new=2)
-	app.run(debug=True)
+	app.run(debug=False)
