@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
-{% block title_block %}Home{% endblock %}
+{% block title_block %}Book Appointment{% endblock %}
 
 {% block nav_left_block %}
-
-
+<a href="{{ url_for('user_appointments') }}" class="btn">View Appointments</a>
+<a href="{{ url_for('user_records') }}" class="btn">Medical Records</a>
 {% endblock %}
 
 {% block nav_right_block %}
@@ -25,10 +25,10 @@
 				</label>
 				<select id="le_apt_type" class="form-select" name="apt_type" required onchange="toggleSubSelect()">
 					<option value="" disabled selected>Select appointment type here !!!</option>
-					<option value="general">General health examination</option>
-					<option value="driver">Driver medical examination</option>
-					<option value="employment">Employment medical examination</option>
-					<option value="demand">On-demand medical service</option>
+					<option value="General">General health examination</option>
+					<option value="Driver">Driver medical examination</option>
+					<option value="Employment">Employment medical examination</option>
+					<option value="On-demand">On-demand medical service</option>
 				</select>
 			</div>
 
@@ -39,9 +39,9 @@
 				<select id="le_category" class="form-select" name="apt_category" required disabled
 					onchange="checkAvailability()">
 					<option value="" disabled selected>Select category here !!!</option>
-					<option value="ent">Ear, Nose and Throat (ENT)</option>
-					<option value="eyes">Ophthalmology (Eyes)</option>
-					<option value="neurology">Neurology</option>
+					<option value="ENT">Ear, Nose and Throat (ENT)</option>
+					<option value="Eyes">Ophthalmology (Eyes)</option>
+					<option value="Neurology">Neurology</option>
 				</select>
 			</div>
 
@@ -60,12 +60,19 @@
 				</label>
 				<select id="le_sesion" class="form-select" name="apt_session" required>
 					<option id="le_session_default" value="" disabled selected>Select session here !!!</option>
-					<option id="le_morning" value="morning">Morning (7 AM - 11 AM)</option>
-					<option id="le_afternoon" value="afternoon">Afternoon (1PM - 6PM)</option>
+					<option id="le_morning" value="Morning">Morning (7 AM - 11 AM)</option>
+					<option id="le_afternoon" value="Afternoon">Afternoon (1PM - 6PM)</option>
 				</select>
 			</div>
-			<button id="submit_button" type="submit" class="btn btn-primary">Submit</button>
 
+			<div class="form-group">
+				<label for="le_description">
+					<h3><strong>STEP 4. Add Description (Optional)</strong></h3>
+				</label>
+			  	<textarea id="le_description" class="form-control" aria-label="With textarea" name="apt_description" placeholder="Describe your symptom to us"></textarea>
+			</div>
+			<button id="submit_button" type="submit" class="btn btn-primary">Submit</button>
+		</form>
 	</div>
 </div>
 {% endblock %}
@@ -79,7 +86,7 @@
 		var category_select_group = document.getElementById("category_select_group");
 
 		// Show the sub-select only when option 4 is selected
-		if (apt_type_select.value == "demand") {
+		if (apt_type_select.value == "On-demand") {
 			category_select_group.style.display = "block";
 			category_select.removeAttribute('disabled');
 		} else {

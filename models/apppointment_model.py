@@ -1,5 +1,6 @@
 class Appointment:
-	def __init__(self, apt_type, apt_category, apt_date, apt_session, apt_number, customer_phone, customer_email, status, description, rating):
+	def __init__(self, apt_type, apt_category, apt_date, apt_session, apt_number, customer_phone, customer_email, status, description, rating, apt_id):
+		self.apt_id = apt_id
 		self.apt_type = apt_type
 		self.apt_category = apt_category
 		self.apt_date = apt_date
@@ -12,7 +13,7 @@ class Appointment:
 		self.rating = rating
 
 	def to_qr_data(self):
-		if self.apt_type != 'demand':
+		if self.apt_type != 'On-demand':
 			the_string = f"""
 Type : {self.apt_type}
 Date : {self.apt_date}
@@ -24,7 +25,7 @@ Email : {self.customer_email}
 		else:
 			the_string = f"""
 Type : {self.apt_type}
-Category : {self.apt_type}
+Category : {self.apt_category}
 Date : {self.apt_date}
 Session : {self.apt_session}
 Queue number : {self.apt_number}

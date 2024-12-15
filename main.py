@@ -41,9 +41,9 @@ def send_remind_email():
 
 	# """
 	# send_email(email_username,email_password, "email", "Appointment Reminder", html_content, generate_qr_code_base64(qr_data))
-	print('sending email')
+	# print('sending email')
 	# print()
-
+	pass
 	
 
 def load_config():
@@ -61,7 +61,7 @@ def main():
 
 @app.route('/login', methods=['GET','POST'])
 def login():
-	# if user logged in
+	# IF USER ALREADY LOGGED IN 
 	if session.get('user_data'):
 		return redirect("/home")
 	
@@ -69,7 +69,7 @@ def login():
 	if request.method == 'POST':
 		phone_number = request.form['phone_number']
 		password = request.form['password']
-		# Load database
+		# LOAD USERS DATA
 		le_data = load_data("users")
 		if not item_existed(phone_number,le_data):
 			# Phone number not found
@@ -90,12 +90,13 @@ def login():
 
 @app.route('/logout', methods=['GET','POST'])
 def logout():
+	# REMOVE SESSION DATA
 	session.pop("user_data",None)
 	return redirect("/")
 	
 @app.route('/register', methods=['GET','POST'])
 def register():
-	# if user logged in
+	# IF USER ALREADY LOGGED IN 
 	if session.get('user_data'):
 		return redirect("/home")
 	# POST
@@ -110,24 +111,32 @@ def register():
 			password = str(hash_password(request.form['password'])),
 			role = 'user'
 			)
-		# Load database
+		# LOAD USERS DATA
 		le_data = load_data("users")
 
 		
 		if item_existed(new_user.phone_number,le_data):
-			# phone number used
+			# PHONE NUMBER USED BY ANOTHER ACCOUNT
 			return render_template('register.html',app_name = app_config['app_name'],message="Phone number is registered to another account",message_type="warning")
 		elif query_existed('email',new_user.email,le_data):
+			# EMAIL IS USED BY ANOTHER ACCOUNT
 			return render_template('register.html',app_name = app_config['app_name'],message="Email is registered to another account",message_type="warning")
 		elif query_existed('ssn',new_user.ssn,le_data):
+			# SSN IS USED BY ANOTHER ACCOUNT
 			return render_template('register.html',app_name = app_config['app_name'],message="SSN is registered to another account",message_type="warning")
 		else:
 			# SUCCESS
-			# add new user
+			# ADD USER TO DATABASE
 			le_data[new_user.phone_number] = new_user.__dict__
 			save_data("users",le_data)
+			# SEND EMAIL
+			html_content = f"""<h3>Account created successfully<h3>
+			<br><p>You have registered an account on our HMS</p>
+			<br><p>Please login to add or edit your personal information</p>"""
+			send_email(new_user.email, "HMS account creation", html_content)
+			print('Registration Mail Sent')
+			# RETURN TO LOGIN SCREEN 
 			return redirect("/login")
-			# return "Nicely done"
 	# GET 
 	return render_template('register.html',app_name = app_config['app_name'])
 
@@ -157,13 +166,13 @@ def profile():
 			'blood_type':request.form['blood_type'],
 			'role':'user'}
 			
-		# Load database
+		# LOAD USERS DATA
 		le_data = load_data("users")
 
-		# Not changing phone number
+		# CASE : PHONE NUMBER NOT CHANGE
 		if item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] == user_data['phone_number']):
 
-			# Change email 
+			# CASE : CHANGE EMAIL
 			if (user_data['email'] != form_data['email']):
 				replace_data('appointments.json',user_data['email'],form_data['email'])
 
@@ -175,16 +184,17 @@ def profile():
 			save_data("users",le_data)
 			return  redirect('/profile')
 
-		# If the new phone number isnt in use
+		# CASE : PHONE NUMBER CHANGE AND NOT IN DATABASE
 		elif not item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] != user_data['phone_number']):
 			old_data = le_data[user_data['phone_number']]
 
-			# Change phone number in appointments database
+			# OBSERVER ?
+			# UPDATE RELATED APPOINTMENTS
 			replace_data('appointments',user_data['phone_number'],form_data['phone_number'])
-			# Change email in appointments database
+			# CASE : IF THEY CHANGE EMAIL AS WELL
 			if (user_data['email'] != form_data['email']):
 				replace_data('appointments',user_data['email'],form_data['email'])
-
+			# SAVE CHANGE TO DATABASE
 			for i in form_data:
 				old_data[i]=form_data[i]
 			le_data.pop(user_data['phone_number'])
@@ -192,24 +202,27 @@ def profile():
 			session['user_data']=old_data
 			save_data("users",le_data)
 			return  redirect('/profile')
-		# If the new phone number is in use
+		# CASE: PHONE NUMBER CHANGE AND IN DATABASE
 		elif item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] != user_data['phone_number']):
 			return render_template('user_profile.html',app_name = app_config['app_name'], user_data = session['user_data'],message="The Phone Number is currently in use",message_type="danger")
-
+		
+	# RENDER USER'S PROFILE SCREEN
 	return render_template('user_profile.html',app_name = app_config['app_name'], user_data = session['user_data'])
 
 @app.route('/book_appointment', methods=['GET','POST'])
 def book_appointment():
+	# USER NOT LOGGED IN 
 	if not session.get('user_data'):
 		return redirect("/login")
 	
 	# POST
 	if request.method == 'POST':
-		# Load database
+		# LOAD APPOINTMENTS DATA
 		le_data = load_data("appointments")
-  
-		if request.form['apt_type'] != "demand":
+		# CASE : ANYTHING ELSE
+		if request.form['apt_type'] != "On-demand":
 			apt_category = ""
+		# CASE : TYPE IS ON DEMAND CHECK CATEGORY
 		else:
 			apt_category = request.form['apt_category']
    
@@ -220,7 +233,10 @@ def book_appointment():
 			if ( item['apt_type'] == request.form['apt_type'] ) and (item['apt_category'] == apt_category) and (item['apt_date'] == request.form['apt_date']) and (item['apt_session'] == request.form['apt_session']):
 				apt_number +=1
   
-		
+
+  		# SAVE TO DATABASE
+		apt_id = len(le_data)+1
+		# CREATE NEW INSTANT OF APPOINTMENT 
 		le_apt = Appointment(apt_type = request.form['apt_type'],
 						apt_category = apt_category,
 						apt_date = request.form['apt_date'],
@@ -229,37 +245,41 @@ def book_appointment():
 						customer_phone = session['user_data']['phone_number'],
 						customer_email = session['user_data']['email'],
 						status="pending",
-						description="",
-						rating=None,			
+						description=request.form['apt_description'],
+						rating=None,
+						apt_id=apt_id
 		)
-		apt_id = len(le_data)+1
-		le_data[f"{apt_id}"]=le_apt.__dict__
-		save_data("appointments",le_data)
 
-		html_content = "<h1>This email is to inform you that you booked an appointment throught our system <h1>"
+		le_data[apt_id]=le_apt.__dict__
+		save_data("appointments",le_data)
+		# SEND EMAIL
+		html_content = """<h3>This email is to inform you that you booked an appointment throught our system <h3>
+		<br><p>Please give this code to our staff upon arrival</p>"""
 		qr_data = f"""
 Appointment Id : {apt_id}
 {le_apt.to_qr_data()}
 		"""
+
 		send_email(le_apt.customer_email, "Appointment Accepted", html_content, generate_qr_code_base64(qr_data))
-		print('sending email')
-
-
-	
+		print('Appointment Mail Sent')
+		# RENDER HOME SCREEN 
 		return redirect('/home')
 	
 	min_date = datetime.today().strftime('%Y-%m-%d')
 	max_date = (datetime.today() + timedelta(weeks=2)).strftime('%Y-%m-%d')
 	return render_template('book_appointment.html', app_name = app_config['app_name'], user_data = session['user_data'], min_date = min_date, max_date = max_date)
 
-
+# API FOR APPOINTMENT BOOKING
+# INPUT APPOINTMENT TYPE & DATE
+# RETURN AVAILABILITY OF MORNING / AFTERNOON SESSION
+ 
 @app.route('/api/get_availability/', methods=['GET'])
 def get_availability():
 	apt_type = request.args.get('apt_type')
 	apt_date = request.args.get('apt_date')
 	apt_category = request.args.get('apt_category')
 
-	if apt_type != 'demand':
+	if apt_type != 'On-demand':
 		apt_category = ""
 
 	le_data = load_data("appointments")
@@ -279,8 +299,53 @@ def get_availability():
 	}
 
 	return jsonify(availability)
+
+# USER'S APPOINTMENTS
+@app.route('/appointments', methods=['GET','POST'])
+def user_appointments():
+	# USER NOT LOGGED IN 
+	if not session.get('user_data'):
+		return redirect("/login")
 	
+	# GET
+	user_data = session['user_data']
+	le_data = load_data("appointments")
+	apt_list = query_with_pair("customer_phone",user_data["phone_number"],le_data)
+	return render_template('user_appointments.html', app_name = app_config['app_name'], user_data=user_data, appointments = apt_list)
+
+# USER'S APPOINTMENTS
+@app.route('/appointment/<apt_id>', methods=['GET','POST'])
+def user_appointment(apt_id):
+	# USER NOT LOGGED IN 
+	if not session.get('user_data'):
+		return redirect("/login")
+
+	# GET
+	user_data = session['user_data']
+	le_data = load_data("appointments")
+	le_apt = le_data[apt_id]
+	if user_data["phone_number"] == le_apt["customer_phone"]:
+		return render_template('user_appointment.html', app_name = app_config['app_name'], user_data=user_data, le_apt = le_apt)
+	else:
+		return redirect("/home")
+
+		
+
+
+# USER'S RECORDS
+@app.route('/records', methods=['GET','POST'])
+def user_records():
+	# USER NOT LOGGED IN 
+	if not session.get('user_data'):
+		return redirect("/login")
+	
+	# POST
+	if request.method == 'POST':
+		# LOAD APPOINTMENTS DATA
+		pass
+	return render_template('user_records.html', app_name = app_config['app_name'], user_data = session['user_data'])
+
 if __name__ == '__main__':
 	scheduler.start()
 	webbrowser.open('http://127.0.0.1:5000/', new=2)
-	app.run(debug=False)
+	app.run(debug=True)

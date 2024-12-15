@@ -8,13 +8,11 @@ def send_email(receiver_email, subject, html_content, base64_image=None):
 			
 	sender_email = os.environ.get('SENDER_EMAIL_USERNAME')
 	sender_password = os.environ.get('SENDER_EMAIL_PASSWORD')
-	print(f'email :"{sender_email}"')
-	print(f'password :"{sender_password}"')
-	print(f'password equal: {sender_password=="plvb ghtz bwvn nyod"}')
+
 	try:
 		#Create MIMEMultipart object
 		msg = MIMEMultipart("alternative")
-		msg["Subject"] = subject
+		msg["Subject"] = "[BETA-TESTING]" + subject
 		msg["From"] = sender_email
 		msg["To"] = receiver_email
 		# filename = "document.pdf"

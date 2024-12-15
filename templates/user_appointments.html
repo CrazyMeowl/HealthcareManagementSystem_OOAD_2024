@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+{% block title_block %}Appointments{% endblock %}
+
+{% block nav_left_block %}
+<a href="{{ url_for('book_appointment') }}" class="btn">Book Appointment</a>
+<a href="{{ url_for('user_records') }}" class="btn">Medical Records</a>
+{% endblock %}
+
+{% block nav_right_block %}
+<!-- <a href="" class="btn">User's Profile</a> -->
+<a href="{{ url_for('logout') }}" class="btn btn-dark">Logout</a>
+{% endblock %}
+
+{% block content_block %}
+<h3>Appointments</h3>
+<br>
+<!-- <li>{{apt}}</li> -->
+<div class="row row-cols-1 row-cols-md-2 g-4">
+
+    {%for apt in appointments%}
+    <div class="col">
+        <div class="card">
+            <!-- <img class="card-img-top" src="..." alt="Card image cap"> -->
+            <div class="card-body">
+                <h5 class="card-title">Appointment {{apt["apt_id"]}} </h5>
+                {% if apt["description"] != "" %}
+                <p class="card-text">Description: {{apt["description"]}}</p>
+                {% endif %}
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Type: {{apt["apt_type"]}}</li>
+                {% if apt["apt_type"] == "On-demand" %}
+                <li class="list-group-item">Category: {{apt["apt_category"]}}</li>
+                {% endif %}
+                <li class="list-group-item">Date: {{apt["apt_date"]}}</li>
+                <li class="list-group-item">Session: {{apt["apt_session"]}}</li>
+                <li class="list-group-item">Number: {{apt["apt_number"]}}</li>
+                <li class="list-group-item">Status: {{apt["status"]}}</li>
+            </ul>
+            <div class="card-body">
+                <a href="{{ url_for('user_appointment',apt_id=apt['apt_id']) }}" class="btn btn-primary">View Detail &
+                    Edit</a>
+                <!-- <a href="#" class="card-link">Another link</a> -->
+            </div>
+        </div>
+    </div>
+    {%endfor%}
+</div>
+
+
+{% endblock %}
+
+{% block script_block %}
+
+{% endblock %}

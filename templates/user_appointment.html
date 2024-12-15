@@ -1,25 +1,23 @@
 {% extends "layout.html" %}
-{% block title_block %}Home{% endblock %}
+{% block title_block %}Appointments{% endblock %}
 
 {% block nav_left_block %}
+
 <a href="{{ url_for('book_appointment') }}" class="btn">Book Appointment</a>
 <a href="{{ url_for('user_appointments') }}" class="btn">View Appointments</a>
 <a href="{{ url_for('user_records') }}" class="btn">Medical Records</a>
 {% endblock %}
 
 {% block nav_right_block %}
-<a href="{{ url_for('profile') }}" class="btn">User's Profile</a>
+<!-- <a href="" class="btn">User's Profile</a> -->
 <a href="{{ url_for('logout') }}" class="btn btn-dark">Logout</a>
 {% endblock %}
 
 {% block content_block %}
-<div class="container">
-	<div class="row">
-		<h2>User's home</h2>
-		{{ user_data['full_name'] }}
-		<!-- THIS IS THE TEMPLATE -->
-		<!-- DO NOT EDIT ON THIS -->
-		<!-- COPY THIS OUT -->
-	</div>
-</div>
+APPOINTMENT
+{{ le_apt }}
+{% endblock %}
+
+{% block script_block %}
+
 {% endblock %}
