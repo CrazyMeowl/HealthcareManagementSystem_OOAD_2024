@@ -1,23 +1,199 @@
 {% extends "layout.html" %}
-{% block title_block %}Appointments{% endblock %}
+{% block title_block %}Appointment Info{% endblock %}
 
 {% block nav_left_block %}
-
-<a href="{{ url_for('book_appointment') }}" class="btn">Book Appointment</a>
-<a href="{{ url_for('user_appointments') }}" class="btn">View Appointments</a>
-<a href="{{ url_for('user_records') }}" class="btn">Medical Records</a>
+<a href="{{ url_for('book_appointment') }}" class="btn">Book Appointment 🤒</a>
+<!-- <a href="{{ url_for('user_appointments') }}" class="btn">View Appointments 📅</a> -->
+<a href="{{ url_for('user_records') }}" class="btn">Medical Records 🧾</a>
 {% endblock %}
 
 {% block nav_right_block %}
-<!-- <a href="" class="btn">User's Profile</a> -->
-<a href="{{ url_for('logout') }}" class="btn btn-dark">Logout</a>
+<a href="{{ url_for('profile') }}" class="btn">👤 User's Profile</a>
+<a href="{{ url_for('logout') }}" class="btn btn-dark">⏏️ Logout</a>
 {% endblock %}
 
 {% block content_block %}
 APPOINTMENT
-{{ le_apt }}
+{{ le_apt }} 
+<h4>EDIT APPOINTMENT</h4>
+<!-- START OF THE FORM -->
+<form id="user_apt_form" method="post" action="{{ url_for('user_appointment',apt_id = le_apt['apt_id']) }}">
+
+    <!-- APT TYPE -->
+    <div class="form-group">
+        <label for="le_apt_type">
+            <h3><strong>STEP 1. Select Appointment Type</strong></h3>
+        </label>
+        <select id="le_apt_type" class="form-select" name="apt_type" required onchange="toggleSubSelect()" disabled>
+            <option value="" disabled>Select appointment type here !!!</option>
+            <option value="General" {% if le_apt["apt_type"] == "General" %}selected{% endif %}>General health examination</option>
+            <option value="Driver" {% if le_apt["apt_type"] == "Driver" %}selected{% endif %}>Driver medical examination</option>
+            <option value="Employment" {% if le_apt["apt_type"] == "Employment" %}selected{% endif %}>Employment medical examination</option>
+            <option value="On-demand" {% if le_apt["apt_type"] == "On-demand" %}selected{% endif %}>On-demand medical service</option>
+        </select>
+    </div>
+
+    <!-- APT CATEGORY -->
+    <div id="category_select_group" class="form-group"  {% if le_apt["apt_type"] != "On-demand" %}style="display:none;"{% endif %} >
+        <label for="le_category">
+            <h3><strong>Step 1.1 Select Wanted Category</strong></h3>
+        </label>
+        <select id="le_category" class="form-select" name="apt_category" required disabled
+            onchange="checkAvailability()">
+            <option value="" disabled >Select category here !!!</option>
+            <option value="ENT" {% if le_apt["apt_category"] == "ENT" %}selected{% endif %}>Ear, Nose and Throat (ENT)</option>
+            <option value="Eyes" {% if le_apt["apt_category"] == "Eyes" %}selected{% endif %}>Ophthalmology (Eyes)</option>
+            <option value="Neurology" {% if le_apt["apt_category"] == "Neurology" %}selected{% endif %}>Neurology</option>
+        </select>
+    </div>
+
+    <!-- APT DATE -->
+    <div class="form-group">
+        <label for="le_apt_date">
+            <h3><strong>STEP 2. Select Date</strong></h3>
+        </label>
+        <input id="le_apt_date" name="apt_date" class="form-control" type="date" min="{{ min_date }}"
+            max="{{ max_date }}" required onchange="checkAvailability()" disabled value="{{le_apt['apt_date']}}"/>
+    </div>
+
+    <!-- APT SESSION -->
+    <div id="" class="form-group">
+        <label for="le_sesion">
+            <h3><strong>STEP 3. Select Session</strong></h3>
+        </label>
+        <select id="le_sesion" class="form-select" name="apt_session" required disabled>
+            <option id="le_session_default" value="" disabled>Select session here !!!</option>
+            <option id="le_morning" value="Morning" {% if le_apt["apt_session"] == "Morning" %}selected{% endif %}>Morning (7 AM - 11 AM)</option>
+            <option id="le_afternoon" value="Afternoon" {% if le_apt["apt_session"] == "Afternoon" %}selected{% endif %}>Afternoon (1PM - 6PM)</option>
+        </select>
+    </div>
+
+    <!-- APT DESCRIPTION -->
+    <div class="form-group">
+        <label for="le_description">
+            <h3><strong>STEP 4. Add Description (Optional)</strong></h3>
+        </label>
+          <textarea id="le_description" class="form-control" aria-label="With textarea" name="apt_description" placeholder="Describe your symptom to us" disabled >{{ le_apt['description'] }}</textarea>
+    </div>
+</form>
+<button id="submit_button" style="display:none;" type="submit" class="btn btn-primary" form="user_apt_form">Submit</button>
+
+<button id="edit_button" onclick="enableEditing()" class="btn btn-primary">Edit Appointment</button>
+
+<a href="{{ url_for('cancel_appointment',apt_id=le_apt['apt_id']) }}" class="btn btn-danger">Cancel Appointment</a>
+
 {% endblock %}
 
 {% block script_block %}
+<script>
+
+	const errorMessage = document.getElementById('error_message');
+	const submitButton = document.getElementById('submit_button');
+
+	function enableEditing() {
+		console.log("LMAO")
+		// Enable form fields by removing the 'disabled' attribute
+		const le_apt_type = document.querySelector('#le_apt_type').removeAttribute('disabled');
+        const le_category = document.querySelector('#le_category').removeAttribute('disabled');
+        const le_apt_date = document.querySelector('#le_apt_date').removeAttribute('disabled');
+        const le_sesion = document.querySelector('#le_sesion').removeAttribute('disabled');
+        const le_description = document.querySelector('#le_description').removeAttribute('disabled');
+		// Show the Save button and hide the Edit button
+		document.getElementById('submit_button').style.display = 'inline-block';
+		document.getElementById('edit_button').style.display = 'none';
+	}
+
+    // function enableEditing() {
+    //     const apt_type_select = document.querySelectorAll('#le_apt_type option');
+	// 	apt_type_select.forEach(function(element) {
+	// 		element.removeAttribute('disabled');
+	// 	});
+    // }
+
+
+
+
+    // Function to show/hide the second select list based on the main select option
+	function toggleSubSelect() {
+		var apt_type_select = document.getElementById("le_apt_type");
+		var category_select = document.getElementById("le_category");
+		var category_select_group = document.getElementById("category_select_group");
+
+		// Show the sub-select only when option 4 is selected
+		if (apt_type_select.value == "On-demand") {
+			category_select_group.style.display = "block";
+			category_select.removeAttribute('disabled');
+		} else {
+			category_select_group.style.display = "none";
+			category_select.setAttribute('disabled', "");
+		}
+		checkAvailability();
+	}
+	function checkAvailability() {
+		console.log("changed")
+		const apt_type = document.getElementById("le_apt_type").value;
+		const category = document.getElementById("le_category").value;
+		const apt_date = document.getElementById("le_apt_date").value;
+
+		const le_sesion = document.getElementById("le_sesion");
+		// reset session selection
+		le_sesion.selectedIndex = 0
+
+		const le_morning = document.getElementById("le_morning");
+		const le_afternoon = document.getElementById("le_afternoon");
+
+		console.log(`?apt_type=${apt_type}&category=${category}&apt_date=${apt_date}`)
+
+
+
+		const baseUrl = window.location.origin;
+		const endpoint = '/api/get_availability'
+		const apiUrl = baseUrl + endpoint + `?apt_type=${apt_type}&category=${category}&apt_date=${apt_date}`;
+		// const apiUrl = `https://yourapi.com/api/check-availability?itemId=${selectedValue}`;
+
+		// Call the API to check availability
+		fetch(apiUrl)
+			.then(response => response.json())  // Assuming the API returns JSON
+			.then(data => {
+				const isMorningAvailable = data.morning;
+				const isAfternoonAvailable = data.afternoon;
+				const today = new Date();
+				const currentHour = today.getHours();
+
+				if (isMorningAvailable) {
+					if ("{{ min_date }}" == apt_date && currentHour >= 10){
+						// Check if the time has passed 10AM
+						le_morning.innerHTML = "Morning (7 AM - 11 AM) Time Passed";
+						le_morning.setAttribute('disabled', "");
+					} else {
+						le_morning.innerHTML = "Morning (7 AM - 11 AM)";
+						le_morning.removeAttribute('disabled');
+					}
+				} else {
+					le_morning.innerHTML = "Morning (7 AM - 11 AM) FULL";
+					le_morning.setAttribute('disabled', "");
+				}
+
+				if (isAfternoonAvailable) {
+					// Check if the time has passed 5PM 
+					if ("{{ min_date }}" == apt_date && currentHour >= 17){
+						le_afternoon.innerHTML = "Afternoon (1PM - 6PM) Time Passed";
+						le_afternoon.setAttribute('disabled', "");
+					} else {
+						le_afternoon.innerHTML = "Afternoon (1PM - 6PM)";
+						le_afternoon.removeAttribute('disabled');
+					}
+					
+				} else {
+					le_afternoon.innerHTML = "Afternoon (1PM - 6PM) FULL";
+					le_afternoon.setAttribute('disabled', "");
+				}
+			})
+			.catch(error => {
+				console.error('Error:', error);
+			});
+	}
+
+</script>
 
 {% endblock %}

@@ -245,7 +245,7 @@ def book_appointment():
 						customer_phone = session['user_data']['phone_number'],
 						customer_email = session['user_data']['email'],
 						status="pending",
-						description=request.form['apt_description'],
+						apt_description=request.form['apt_description'],
 						rating=None,
 						apt_id=apt_id
 		)
@@ -255,10 +255,7 @@ def book_appointment():
 		# SEND EMAIL
 		html_content = """<h3>This email is to inform you that you booked an appointment throught our system <h3>
 		<br><p>Please give this code to our staff upon arrival</p>"""
-		qr_data = f"""
-Appointment Id : {apt_id}
-{le_apt.to_qr_data()}
-		"""
+		qr_data = f"""Appointment Id : {apt_id}"""
 
 		send_email(le_apt.customer_email, "Appointment Accepted", html_content, generate_qr_code_base64(qr_data))
 		print('Appointment Mail Sent')
@@ -313,9 +310,60 @@ def user_appointments():
 	apt_list = query_with_pair("customer_phone",user_data["phone_number"],le_data)
 	return render_template('user_appointments.html', app_name = app_config['app_name'], user_data=user_data, appointments = apt_list)
 
-# USER'S APPOINTMENTS
-@app.route('/appointment/<apt_id>', methods=['GET','POST'])
+# USER'S APPOINTMENT
+@app.route('/appointment/<apt_id>', methods=['GET','POST','DELETE'])
 def user_appointment(apt_id):
+	# USER NOT LOGGED IN 
+	if not session.get('user_data'):
+		return redirect("/login")
+
+	# POST
+	if request.method == 'POST':
+		user_data = session['user_data']
+		le_data = load_data("appointments")
+		le_apt = le_data[apt_id]
+		if user_data["phone_number"] == le_apt["customer_phone"]:
+			# UPDATE TYPE
+			le_apt['apt_type'] = request.form['apt_type']
+			# UPDATE CATEGORY
+			if le_apt['apt_type'] == 'On-demand':
+				le_apt['apt_category'] = request.form['apt_category']
+			else:
+				le_apt['apt_category'] = ""
+			# UPDATE DATE
+			le_apt['apt_date'] = request.form['apt_date']
+			# UPDATE SESSION
+			le_apt['apt_session'] = request.form['apt_session']
+			# UPDATE DESCRIPTION
+			le_apt['apt_description'] = request.form['apt_description']
+			# UPDATE NUMBER
+			apt_number = 1
+			for item_id in le_data:
+				item  = le_data[item_id]
+				if ( item['apt_type'] == request.form['apt_type'] ) and (item['apt_category'] == le_apt['apt_category']) and (item['apt_date'] == request.form['apt_date']) and (item['apt_session'] == request.form['apt_session']):
+					apt_number +=1
+			le_apt['apt_number'] = apt_number
+
+			# UPDATE DATA
+			le_data[apt_id] = le_apt
+			save_data("appointments",le_data)
+		return redirect("/home")
+
+	
+	# GET
+	user_data = session['user_data']
+	le_data = load_data("appointments")
+	le_apt = le_data[apt_id]
+	if user_data["phone_number"] == le_apt["customer_phone"]:
+		min_date = datetime.today().strftime('%Y-%m-%d')
+		max_date = (datetime.today() + timedelta(weeks=2)).strftime('%Y-%m-%d')
+		return render_template('user_appointment.html', app_name = app_config['app_name'], user_data=user_data, le_apt = le_apt, min_date = min_date, max_date = max_date)
+	else:
+		return redirect("/home")
+
+# USER'S APPOINTMENT
+@app.route('/delete_appointment/<apt_id>', methods=['GET'])
+def cancel_appointment(apt_id):
 	# USER NOT LOGGED IN 
 	if not session.get('user_data'):
 		return redirect("/login")
@@ -325,10 +373,12 @@ def user_appointment(apt_id):
 	le_data = load_data("appointments")
 	le_apt = le_data[apt_id]
 	if user_data["phone_number"] == le_apt["customer_phone"]:
-		return render_template('user_appointment.html', app_name = app_config['app_name'], user_data=user_data, le_apt = le_apt)
-	else:
-		return redirect("/home")
+		le_apt["status"] = "Canceled"
+		le_data[apt_id] = le_apt
+		save_data("appointments",le_data)
 
+		return redirect("/appointments")
+	return redirect("/home")
 		
 
 
