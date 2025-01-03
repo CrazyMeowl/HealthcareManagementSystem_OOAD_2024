@@ -13,7 +13,59 @@
 {% endblock %}
 
 {% block content_block %}
-RECORDS
+<!-- RECORDS -->
+<!-- {{ user_data }} -->
+<h3>User's Medical Records</h3>
+<label for="surgeries_list">Surgeries</label>
+
+<ul id="surgeries_list" class="list-group">
+    {% if user_data["record"]["Surgeries"] | length == 0 %}
+        <li class="list-group-item"> None </li> 
+    {% else %}
+        {% for item in user_data["record"]["Surgeries"] %}
+            <li class="list-group-item">{{ item }}</li>
+        {% endfor %}
+    {% endif %}
+</ul>
+
+<label for="condition_list">Chronic condition</label>
+
+<ul id="condition_list" class="list-group">
+    {% if user_data["record"]["Chronic condition"] | length == 0 %}
+        <li class="list-group-item"> None </li>
+    {% else %}
+        {% for item in user_data["record"]["Chronic condition"] %}
+            <li class="list-group-item">{{ item }}</li>
+        {% endfor %}
+    {% endif %}
+</ul>
+
+<label for="allergies_list">Allergies</label>
+
+<ul id="allergies_list" class="list-group">
+    {% if user_data["record"]["Allergies"] | length == 0 %}
+        <li class="list-group-item"> None </li>
+    {% else %}
+        {% for item in user_data["record"]["Allergies"] %}
+            <li class="list-group-item">{{ item }}</li>
+        {% endfor %}
+    {% endif %}
+</ul>
+
+<label for="illnesses_list">Illnesses</label>
+
+<ul id="illnesses_list" class="list-group">
+    {% if user_data["record"]["Illnesses"] | length == 0 %}
+        <li class="list-group-item"> None </li>
+    {% else %}
+        {% for item in user_data["record"]["Illnesses"] %}
+            <li class="list-group-item">{{ item }}</li>
+        {% endfor %}
+    {% endif %}
+</ul>
+
+
+
 {% endblock %}
 
 {% block script_block %}

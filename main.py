@@ -205,7 +205,12 @@ def profile():
 		# CASE: PHONE NUMBER CHANGE AND IN DATABASE
 		elif item_existed(form_data['phone_number'],le_data) and (form_data['phone_number'] != user_data['phone_number']):
 			return render_template('user_profile.html',app_name = app_config['app_name'], user_data = session['user_data'],message="The Phone Number is currently in use",message_type="danger")
+	
 		
+	# REFRESH SESSION DATA
+	le_data = load_data("users")
+	session['user_data']=le_data[session['user_data']['phone_number']]
+	
 	# RENDER USER'S PROFILE SCREEN
 	return render_template('user_profile.html',app_name = app_config['app_name'], user_data = session['user_data'])
 
@@ -244,7 +249,7 @@ def book_appointment():
 						apt_number = apt_number,
 						customer_phone = session['user_data']['phone_number'],
 						customer_email = session['user_data']['email'],
-						status="pending",
+						status="Pending",
 						apt_description=request.form['apt_description'],
 						rating=None,
 						apt_id=apt_id
@@ -283,9 +288,14 @@ def get_availability():
 
 	morning_count = 0
 	afternoon_count = 0
+
+	print(f'Type: {apt_type}')
+	print(f'Category: {apt_category}')
+	print(f'Date: {apt_date}')
+	
 	for i in le_data:
 		if (le_data[i]['apt_date'] == apt_date) and (le_data[i]['apt_type'] == apt_type) and (le_data[i]['apt_category'] == apt_category):
-			if le_data[i]['apt_session'] == 'morning':
+			if le_data[i]['apt_session'] == 'Morning':
 				morning_count+=1
 			else: 
 				afternoon_count+=1
@@ -294,7 +304,7 @@ def get_availability():
 		'morning': morning_count < 10,
 		'afternoon': afternoon_count < 10,
 	}
-
+	print( availability)
 	return jsonify(availability)
 
 # USER'S APPOINTMENTS
@@ -322,6 +332,7 @@ def user_appointment(apt_id):
 		user_data = session['user_data']
 		le_data = load_data("appointments")
 		le_apt = le_data[apt_id]
+		# IF THE USER IS THE OWNER OF THE APT
 		if user_data["phone_number"] == le_apt["customer_phone"]:
 			# UPDATE TYPE
 			le_apt['apt_type'] = request.form['apt_type']
@@ -351,6 +362,11 @@ def user_appointment(apt_id):
 
 	
 	# GET
+	
+	# REFRESH SESSION DATA
+	le_data = load_data("users")
+	session['user_data']=le_data[session['user_data']['phone_number']]
+	
 	user_data = session['user_data']
 	le_data = load_data("appointments")
 	le_apt = le_data[apt_id]
@@ -361,7 +377,7 @@ def user_appointment(apt_id):
 	else:
 		return redirect("/home")
 
-# USER'S APPOINTMENT
+# CANCEL USER'S APPOINTMENT
 @app.route('/delete_appointment/<apt_id>', methods=['GET'])
 def cancel_appointment(apt_id):
 	# USER NOT LOGGED IN 
@@ -380,7 +396,23 @@ def cancel_appointment(apt_id):
 		return redirect("/appointments")
 	return redirect("/home")
 		
+# CANCEL USER'S APPOINTMENT
+@app.route('/rate_appointment/<apt_id>/<rating>', methods=['GET'])
+def rate_appointment(apt_id,rating):
+	# USER NOT LOGGED IN 
+	if not session.get('user_data'):
+		return redirect("/login")
 
+	user_data = session['user_data']
+	le_data = load_data("appointments")
+	le_apt = le_data[apt_id]
+	if user_data["phone_number"] == le_apt["customer_phone"]:
+		le_apt["rating"] = rating
+		le_data[apt_id] = le_apt
+		save_data("appointments",le_data)
+
+		return "Nice"
+	return redirect("/home")
 
 # USER'S RECORDS
 @app.route('/records', methods=['GET','POST'])
@@ -393,6 +425,10 @@ def user_records():
 	if request.method == 'POST':
 		# LOAD APPOINTMENTS DATA
 		pass
+	# REFRESH SESSION DATA
+	le_data = load_data("users")
+	session['user_data']=le_data[session['user_data']['phone_number']]
+
 	return render_template('user_records.html', app_name = app_config['app_name'], user_data = session['user_data'])
 
 if __name__ == '__main__':

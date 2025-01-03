@@ -84,23 +84,23 @@
 	// Function to show/hide the second select list based on the main select option
 	function toggleSubSelect() {
 		var apt_type_select = document.getElementById("le_apt_type");
-		var category_select = document.getElementById("le_category");
-		var category_select_group = document.getElementById("category_select_group");
+		var apt_category_select = document.getElementById("le_category");
+		var apt_category_select_group = document.getElementById("category_select_group");
 
 		// Show the sub-select only when option 4 is selected
 		if (apt_type_select.value == "On-demand") {
-			category_select_group.style.display = "block";
-			category_select.removeAttribute('disabled');
+			apt_category_select_group.style.display = "block";
+			apt_category_select.removeAttribute('disabled');
 		} else {
-			category_select_group.style.display = "none";
-			category_select.setAttribute('disabled', "");
+			apt_category_select_group.style.display = "none";
+			apt_category_select.setAttribute('disabled', "");
 		}
 		checkAvailability();
 	}
 	function checkAvailability() {
 		console.log("changed")
 		const apt_type = document.getElementById("le_apt_type").value;
-		const category = document.getElementById("le_category").value;
+		const apt_category = document.getElementById("le_category").value;
 		const apt_date = document.getElementById("le_apt_date").value;
 
 		const le_sesion = document.getElementById("le_sesion");
@@ -110,13 +110,13 @@
 		const le_morning = document.getElementById("le_morning");
 		const le_afternoon = document.getElementById("le_afternoon");
 
-		console.log(`?apt_type=${apt_type}&category=${category}&apt_date=${apt_date}`)
+		console.log(`?apt_type=${apt_type}&apt_category=${apt_category}&apt_date=${apt_date}`)
 
 
 
 		const baseUrl = window.location.origin;
 		const endpoint = '/api/get_availability'
-		const apiUrl = baseUrl + endpoint + `?apt_type=${apt_type}&category=${category}&apt_date=${apt_date}`;
+		const apiUrl = baseUrl + endpoint + `?apt_type=${apt_type}&apt_category=${apt_category}&apt_date=${apt_date}`;
 		// const apiUrl = `https://yourapi.com/api/check-availability?itemId=${selectedValue}`;
 
 		// Call the API to check availability
@@ -127,7 +127,7 @@
 				const isAfternoonAvailable = data.afternoon;
 				const today = new Date();
 				const currentHour = today.getHours();
-
+				console.log(data)
 				if (isMorningAvailable) {
 					if ("{{ min_date }}" == apt_date && currentHour >= 10){
 						// Check if the time has passed 10AM
@@ -168,7 +168,7 @@
 
 	function disableButton() {
 			document.getElementById('submit_button').disabled = true;
-            alert('Button clicked!');
+            alert('Your appointment is booked successfully! Please wait a few second while we process the email.');
 			var form = document.getElementById("book_apt_form");
 			form.submit();
         }

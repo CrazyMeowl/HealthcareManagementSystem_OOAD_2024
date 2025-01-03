@@ -13,74 +13,130 @@
 {% endblock %}
 
 {% block content_block %}
-APPOINTMENT
-{{ le_apt }} 
+<!-- APPOINTMENT
+{{ le_apt }} -->
 <h4>EDIT APPOINTMENT</h4>
 <!-- START OF THE FORM -->
 <form id="user_apt_form" method="post" action="{{ url_for('user_appointment',apt_id = le_apt['apt_id']) }}">
 
-    <!-- APT TYPE -->
-    <div class="form-group">
-        <label for="le_apt_type">
-            <h3><strong>STEP 1. Select Appointment Type</strong></h3>
-        </label>
-        <select id="le_apt_type" class="form-select" name="apt_type" required onchange="toggleSubSelect()" disabled>
-            <option value="" disabled>Select appointment type here !!!</option>
-            <option value="General" {% if le_apt["apt_type"] == "General" %}selected{% endif %}>General health examination</option>
-            <option value="Driver" {% if le_apt["apt_type"] == "Driver" %}selected{% endif %}>Driver medical examination</option>
-            <option value="Employment" {% if le_apt["apt_type"] == "Employment" %}selected{% endif %}>Employment medical examination</option>
-            <option value="On-demand" {% if le_apt["apt_type"] == "On-demand" %}selected{% endif %}>On-demand medical service</option>
-        </select>
-    </div>
+	<!-- APT TYPE -->
+	<div class="form-group">
+		<label for="le_apt_type">
+			<h3><strong>STEP 1. Select Appointment Type</strong></h3>
+		</label>
+		<select id="le_apt_type" class="form-select" name="apt_type" required onchange="toggleSubSelect()" disabled>
+			<option value="" disabled>Select appointment type here !!!</option>
+			<option value="General" {% if le_apt["apt_type"]=="General" %}selected{% endif %}>General health examination
+			</option>
+			<option value="Driver" {% if le_apt["apt_type"]=="Driver" %}selected{% endif %}>Driver medical examination
+			</option>
+			<option value="Employment" {% if le_apt["apt_type"]=="Employment" %}selected{% endif %}>Employment medical
+				examination</option>
+			<option value="On-demand" {% if le_apt["apt_type"]=="On-demand" %}selected{% endif %}>On-demand medical
+				service</option>
+		</select>
+	</div>
 
-    <!-- APT CATEGORY -->
-    <div id="category_select_group" class="form-group"  {% if le_apt["apt_type"] != "On-demand" %}style="display:none;"{% endif %} >
-        <label for="le_category">
-            <h3><strong>Step 1.1 Select Wanted Category</strong></h3>
-        </label>
-        <select id="le_category" class="form-select" name="apt_category" required disabled
-            onchange="checkAvailability()">
-            <option value="" disabled >Select category here !!!</option>
-            <option value="ENT" {% if le_apt["apt_category"] == "ENT" %}selected{% endif %}>Ear, Nose and Throat (ENT)</option>
-            <option value="Eyes" {% if le_apt["apt_category"] == "Eyes" %}selected{% endif %}>Ophthalmology (Eyes)</option>
-            <option value="Neurology" {% if le_apt["apt_category"] == "Neurology" %}selected{% endif %}>Neurology</option>
-        </select>
-    </div>
+	<!-- APT CATEGORY -->
+	<div id="category_select_group" class="form-group" {% if le_apt["apt_type"] !="On-demand" %}style="display:none;" {%
+		endif %}>
+		<label for="le_category">
+			<h3><strong>Step 1.1 Select Wanted Category</strong></h3>
+		</label>
+		<select id="le_category" class="form-select" name="apt_category" required disabled
+			onchange="checkAvailability()">
+			<option value="" disabled>Select category here !!!</option>
+			<option value="ENT" {% if le_apt["apt_category"]=="ENT" %}selected{% endif %}>Ear, Nose and Throat (ENT)
+			</option>
+			<option value="Eyes" {% if le_apt["apt_category"]=="Eyes" %}selected{% endif %}>Ophthalmology (Eyes)
+			</option>
+			<option value="Neurology" {% if le_apt["apt_category"]=="Neurology" %}selected{% endif %}>Neurology</option>
+		</select>
+	</div>
 
-    <!-- APT DATE -->
-    <div class="form-group">
-        <label for="le_apt_date">
-            <h3><strong>STEP 2. Select Date</strong></h3>
-        </label>
-        <input id="le_apt_date" name="apt_date" class="form-control" type="date" min="{{ min_date }}"
-            max="{{ max_date }}" required onchange="checkAvailability()" disabled value="{{le_apt['apt_date']}}"/>
-    </div>
+	<!-- APT DATE -->
+	<div class="form-group">
+		<label for="le_apt_date">
+			<h3><strong>STEP 2. Select Date</strong></h3>
+		</label>
+		<input id="le_apt_date" name="apt_date" class="form-control" type="date" min="{{ min_date }}"
+			max="{{ max_date }}" required onchange="checkAvailability()" disabled value="{{le_apt['apt_date']}}" />
+	</div>
 
-    <!-- APT SESSION -->
-    <div id="" class="form-group">
-        <label for="le_sesion">
-            <h3><strong>STEP 3. Select Session</strong></h3>
-        </label>
-        <select id="le_sesion" class="form-select" name="apt_session" required disabled>
-            <option id="le_session_default" value="" disabled>Select session here !!!</option>
-            <option id="le_morning" value="Morning" {% if le_apt["apt_session"] == "Morning" %}selected{% endif %}>Morning (7 AM - 11 AM)</option>
-            <option id="le_afternoon" value="Afternoon" {% if le_apt["apt_session"] == "Afternoon" %}selected{% endif %}>Afternoon (1PM - 6PM)</option>
-        </select>
-    </div>
+	<!-- APT SESSION -->
+	<div id="" class="form-group">
+		<label for="le_sesion">
+			<h3><strong>STEP 3. Select Session</strong></h3>
+		</label>
+		<select id="le_sesion" class="form-select" name="apt_session" required disabled>
+			<option id="le_session_default" value="" disabled>Select session here !!!</option>
+			<option id="le_morning" value="Morning" {% if le_apt["apt_session"]=="Morning" %}selected{% endif %}>Morning
+				(7 AM - 11 AM)</option>
+			<option id="le_afternoon" value="Afternoon" {% if le_apt["apt_session"]=="Afternoon" %}selected{% endif %}>
+				Afternoon (1PM - 6PM)</option>
+		</select>
+	</div>
 
-    <!-- APT DESCRIPTION -->
-    <div class="form-group">
-        <label for="le_description">
-            <h3><strong>STEP 4. Add Description (Optional)</strong></h3>
-        </label>
-          <textarea id="le_description" class="form-control" aria-label="With textarea" name="apt_description" placeholder="Describe your symptom to us" disabled >{{ le_apt['description'] }}</textarea>
-    </div>
+	<!-- APT DESCRIPTION -->
+	<div class="form-group">
+		<label for="le_description">
+			<h3><strong>STEP 4. Add Description (Optional)</strong></h3>
+		</label>
+		<textarea id="le_description" class="form-control" aria-label="With textarea" name="apt_description"
+			placeholder="Describe your symptom to us" disabled>{{ le_apt['description'] }}</textarea>
+	</div>
 </form>
-<button id="submit_button" style="display:none;" type="submit" class="btn btn-primary" form="user_apt_form">Submit</button>
+
+{% if le_apt["status"] != "Done" %}
+
+<button id="submit_button" style="display:none;" type="submit" class="btn btn-primary"
+	form="user_apt_form">Submit</button>
 
 <button id="edit_button" onclick="enableEditing()" class="btn btn-primary">Edit Appointment</button>
 
 <a href="{{ url_for('cancel_appointment',apt_id=le_apt['apt_id']) }}" class="btn btn-danger">Cancel Appointment</a>
+
+
+{% else %}
+<br>
+<div class="col">
+	
+	<div class="input-group">
+
+		{% if le_apt["rating"] == "None" %} 
+		<legend>Give this appointment a rating</legend> 
+		{% else %}
+		<legend>Change your rating</legend> 
+		{% endif %}
+		
+		
+		
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="rating" id="rating1" value="1" {% if le_apt["rating"] == "1" %} checked {% endif %}>
+			<label class="form-check-label" for="rating1" >1 (Poor)</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="rating" id="rating2" value="2" {% if le_apt["rating"] == "2" %} checked {% endif %}>
+			<label class="form-check-label" for="rating2">2 (Bad)</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="rating" id="rating3" value="3" {% if le_apt["rating"] == "3" %} checked {% endif %}>
+			<label class="form-check-label" for="rating3">3 (Average)</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="rating" id="rating4" value="4" {% if le_apt["rating"] == "4" %} checked {% endif %}>
+			<label class="form-check-label" for="rating4">4 (Good)</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="rating" id="rating5" value="5" {% if le_apt["rating"] == "5" %} checked {% endif %}>
+			<label class="form-check-label" for="rating5">5 (Exellent)</label>
+		</div>
+	</div>
+
+</div>
+
+{% endif %}
+
 
 {% endblock %}
 
@@ -94,26 +150,26 @@ APPOINTMENT
 		console.log("LMAO")
 		// Enable form fields by removing the 'disabled' attribute
 		const le_apt_type = document.querySelector('#le_apt_type').removeAttribute('disabled');
-        const le_category = document.querySelector('#le_category').removeAttribute('disabled');
-        const le_apt_date = document.querySelector('#le_apt_date').removeAttribute('disabled');
-        const le_sesion = document.querySelector('#le_sesion').removeAttribute('disabled');
-        const le_description = document.querySelector('#le_description').removeAttribute('disabled');
+		const le_category = document.querySelector('#le_category').removeAttribute('disabled');
+		const le_apt_date = document.querySelector('#le_apt_date').removeAttribute('disabled');
+		const le_sesion = document.querySelector('#le_sesion').removeAttribute('disabled');
+		const le_description = document.querySelector('#le_description').removeAttribute('disabled');
 		// Show the Save button and hide the Edit button
 		document.getElementById('submit_button').style.display = 'inline-block';
 		document.getElementById('edit_button').style.display = 'none';
 	}
 
-    // function enableEditing() {
-    //     const apt_type_select = document.querySelectorAll('#le_apt_type option');
+	// function enableEditing() {
+	//     const apt_type_select = document.querySelectorAll('#le_apt_type option');
 	// 	apt_type_select.forEach(function(element) {
 	// 		element.removeAttribute('disabled');
 	// 	});
-    // }
+	// }
 
 
 
 
-    // Function to show/hide the second select list based on the main select option
+	// Function to show/hide the second select list based on the main select option
 	function toggleSubSelect() {
 		var apt_type_select = document.getElementById("le_apt_type");
 		var category_select = document.getElementById("le_category");
@@ -161,7 +217,7 @@ APPOINTMENT
 				const currentHour = today.getHours();
 
 				if (isMorningAvailable) {
-					if ("{{ min_date }}" == apt_date && currentHour >= 10){
+					if ("{{ min_date }}" == apt_date && currentHour >= 10) {
 						// Check if the time has passed 10AM
 						le_morning.innerHTML = "Morning (7 AM - 11 AM) Time Passed";
 						le_morning.setAttribute('disabled', "");
@@ -176,14 +232,14 @@ APPOINTMENT
 
 				if (isAfternoonAvailable) {
 					// Check if the time has passed 5PM 
-					if ("{{ min_date }}" == apt_date && currentHour >= 17){
+					if ("{{ min_date }}" == apt_date && currentHour >= 17) {
 						le_afternoon.innerHTML = "Afternoon (1PM - 6PM) Time Passed";
 						le_afternoon.setAttribute('disabled', "");
 					} else {
 						le_afternoon.innerHTML = "Afternoon (1PM - 6PM)";
 						le_afternoon.removeAttribute('disabled');
 					}
-					
+
 				} else {
 					le_afternoon.innerHTML = "Afternoon (1PM - 6PM) FULL";
 					le_afternoon.setAttribute('disabled', "");
@@ -193,6 +249,20 @@ APPOINTMENT
 				console.error('Error:', error);
 			});
 	}
+
+	const ratingButtons = document.querySelectorAll('input[type="radio"][name="rating"]');
+
+	ratingButtons.forEach(ratingButton => {
+		ratingButton.addEventListener('change', () => {
+			const rating = ratingButton.value;
+			const apt_id = {{ le_apt['apt_id'] }};
+			// console.log(rating)
+			const baseUrl = window.location.origin;
+			const ratingUrl = baseUrl + `/rate_appointment/${apt_id}/${rating}`;
+			// console.log(ratingUrl)
+			fetch(ratingUrl)
+		});
+	});
 
 </script>
 

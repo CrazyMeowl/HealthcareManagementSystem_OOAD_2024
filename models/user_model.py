@@ -11,4 +11,10 @@ class User:
 		self.weight = weight
 		self.blood_type = blood_type
 		self.role = role
+		self.record = {
+			"Surgeries":[],
+			"Chronic condition":[],
+			"Allergies":[],
+			"Illnesses":[],
+		}
 	

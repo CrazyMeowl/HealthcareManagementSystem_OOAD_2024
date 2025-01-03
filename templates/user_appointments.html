@@ -40,7 +40,8 @@
 						<li class="list-group-item">Status: {{apt["status"]}}</li>
 					</ul>
 					<div class="card-body">
-						<a href="{{ url_for('user_appointment',apt_id=apt['apt_id']) }}" class="btn btn-primary">View Detail & Edit</a>
+						
+							<a href="{{ url_for('user_appointment',apt_id=apt['apt_id']) }}" class="btn btn-primary">View Detail {% if apt["status"] != "Done" %} & Edit {% endif %}</a>
 						
 						<!-- <a href="#" class="card-link">Another link</a> -->
 					</div>
