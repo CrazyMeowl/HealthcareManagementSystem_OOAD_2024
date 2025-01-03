@@ -13,6 +13,7 @@ from utils.password_utils import *
 from utils.database_utils import *
 from utils.qr_code_utils import * 
 from utils.email_utils import *
+from utils.date_utils import *
 from models.user_model import *
 from models.apppointment_model import *
 
@@ -34,17 +35,29 @@ scheduler.init_app(app)
 # Define the routine function
 @scheduler.task('interval', id='send_remind_email', minutes=1)
 def send_remind_email():
-	# email_username = os.environ.get('SENDER_EMAIL_USERNAME')
-	# email_password = os.environ.get('SENDER_EMAIL_PASSWORD')
-	# html_content = "<h1>Your appointment is near<h1>"
-	# qr_data = f"""/
+	reminded_list = load_data("reminded")
+	apt_list = load_data("appointments")
 
-	# """
-	# send_email(email_username,email_password, "email", "Appointment Reminder", html_content, generate_qr_code_base64(qr_data))
-	# print('sending email')
-	# print()
-	pass
-	
+	for apt_id in apt_list:
+		if apt_id not in reminded_list:
+			le_apt = apt_list[apt_id]
+			
+			if days_from_today(le_apt["apt_date"]) < 1:
+				if le_apt['apt_type'] == "On-demand":
+
+					html_content = f"""<h3>YOUR UPCOMING APPOINTMENT IS NEAR<h3><br><p> Type: {le_apt["apt_type"]}</p><br><p> Category: {le_apt["apt_category"]}</p><br><p> Date: {le_apt["apt_date"]}</p><br><p> Session: {le_apt["apt_session"]}</p><br><p> Number: {le_apt["apt_number"]}</p>"""
+
+				else:
+					html_content = f"""<h3>YOUR UPCOMING APPOINTMENT IS NEAR<h3><br><p> Type: {le_apt["apt_type"]}</p><br><p> Date: {le_apt["apt_date"]}</p><br><p> Session: {le_apt["apt_session"]}</p><br><p> Number: {le_apt["apt_number"]}</p>"""
+				qr_data = f"""Appointment Id : {apt_id}"""
+				# send_email(le_apt.customer_email, "Appointment Accepted", html_content, generate_qr_code_base64(qr_data))
+				print('sending email')
+				print(html_content)
+				print()
+				pass
+				reminded_list.append(apt_id)
+
+	save_data("reminded",reminded_list)
 
 def load_config():
 	with open("config.json",'r',encoding='utf-8') as f:
@@ -433,5 +446,5 @@ def user_records():
 
 if __name__ == '__main__':
 	scheduler.start()
-	webbrowser.open('http://127.0.0.1:5000/', new=2)
+	# webbrowser.open('http://127.0.0.1:5000/', new=2)
 	app.run(debug=True)

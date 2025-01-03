@@ -255,7 +255,7 @@
 	ratingButtons.forEach(ratingButton => {
 		ratingButton.addEventListener('change', () => {
 			const rating = ratingButton.value;
-			const apt_id = {{ le_apt['apt_id'] }};
+			const apt_id = {{ le_apt["apt_id"] }} ;
 			// console.log(rating)
 			const baseUrl = window.location.origin;
 			const ratingUrl = baseUrl + `/rate_appointment/${apt_id}/${rating}`;
