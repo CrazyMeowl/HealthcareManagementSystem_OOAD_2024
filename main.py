@@ -271,10 +271,12 @@ def book_appointment():
 		le_data[apt_id]=le_apt.__dict__
 		save_data("appointments",le_data)
 		# SEND EMAIL
-		html_content = """<h3>This email is to inform you that you booked an appointment throught our system <h3>
-		<br><p>Please give this code to our staff upon arrival</p>"""
+		examine_route = get_examine_route(le_apt.apt_type,le_apt.apt_category)
+		html_content = f"""<h3>This email is to inform you that you booked an appointment throught our system <h3>{examine_route}
+		<br><p>Please give the attached qrcode to our staff upon arrival</p>"""
 		qr_data = f"""Appointment Id : {apt_id}"""
 
+		print(html_content)
 		send_email(le_apt.customer_email, "Appointment Accepted", html_content, generate_qr_code_base64(qr_data))
 		print('Appointment Mail Sent')
 		# RENDER HOME SCREEN 

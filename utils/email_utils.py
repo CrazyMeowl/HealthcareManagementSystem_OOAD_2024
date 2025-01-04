@@ -46,3 +46,31 @@ def send_email(receiver_email, subject, html_content, base64_image=None):
 	except Exception as bug:
 		print(bug)
 
+
+def get_examine_route(apt_type, apt_category):
+	if apt_type == "On-demand":
+		if apt_category == "ENT":
+			steps = ["Fillout the background check form (Reception area)","General Inspection","Examination of the Ears/Nose and Sinuses/Oral Cavity and Throat/Larynx and Voice","Final Assessment"]
+		elif apt_category == "Eyes":
+			steps = ["Fillout the background check form (Reception area)","Visual Field Testing","Inspection","Pupil Reactions","Final Assessment"]
+		elif apt_category == "Neurology":
+			steps = ["Fillout the background check form (Reception area)","Reflexes","Sensory System Examination","Motor System Examination","Final Assessment"]
+		else:
+			steps = None
+	elif apt_type == "General":
+		steps = ["Fillout the background check form (Reception area)"," Vital Signs","General Appearance","Head, Neck, and Lymphatic System", "Cardiovascular System", "Respiratory System", "Abdominal Examination", "Skin, Hair, and Nails","Final Assessment"]
+		
+	elif apt_type == "Driver":
+		steps = ["Fillout the background check form (Reception area)"," Vision Test","Cognitive and Mental Health Assessment", "Neurological Examination", "Hearing Test", "Blood Tests (if applicable):","Final Assessment"]
+	elif apt_type == "Employment":
+		steps = ["Fillout the background check form (Reception area)","General Physical Examination","Vision and Hearing Test", "Neurological Examination", "Respiratory Function Test (if applicable):", "Blood Tests (if applicable):","Final Assessment"]
+
+	else:
+		steps = None
+
+	if steps:
+		le_string = ""
+		for step in steps:
+			le_string+=f"<li>{step}</li>"
+		examine_route = f"""<ul>{le_string}</ul>"""
+		return examine_route
