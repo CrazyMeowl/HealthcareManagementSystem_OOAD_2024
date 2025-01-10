@@ -15,7 +15,7 @@ PREREQUISITE: Have an email for mailing service
 ## Setup
 Step 0: Edit the "setup_secret.bat" with your email credentials.
 For example 
-```json
+```bat
 setx SENDER_EMAIL_USERNAME example@email.com /m
 setx SENDER_EMAIL_PASSWORD example_app_password /m
 ```
